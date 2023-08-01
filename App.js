@@ -15,7 +15,7 @@ import {
 	Dimensions,
 } from "react-native";
 
-import backGroundImage from "./assets/Fallout-Ero-Fallout-фэндомы-Fallout-3-2618067.jpeg";
+import backGroundImage from "./assets/girl-face.jpg";
 
 // fonts
 import { useFonts } from "expo-font";
@@ -84,7 +84,7 @@ export default function App() {
 					<KeyboardAvoidingView
 						style={styles.keyboardView}
 						behavior={Platform.OS === "ios" && "padding"}>
-						<Text style={styles.text}>Slave work</Text>
+						<Text style={styles.text}>Great work</Text>
 						<View
 							style={{
 								...styles.form,
@@ -92,7 +92,7 @@ export default function App() {
 								// width: dimensions,
 							}}>
 							<View>
-								<Text style={styles.inputTitle}>Slave Address</Text>
+								<Text style={styles.inputTitle}>Email address</Text>
 								<TextInput
 									value={state.email}
 									style={styles.input}
@@ -106,7 +106,7 @@ export default function App() {
 							</View>
 
 							<View style={{ marginTop: 20 }}>
-								<Text style={styles.inputTitle}>Slave Password</Text>
+								<Text style={styles.inputTitle}>Password</Text>
 								<TextInput
 									value={state.password}
 									style={styles.input}
