@@ -1,6 +1,7 @@
-import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+
 import {
 	ImageBackground,
 	StyleSheet,
@@ -14,15 +15,14 @@ import {
 	TouchableWithoutFeedback,
 } from "react-native";
 
-import backGroundImage from "../assets/japan.jpg";
+import backGroundImage from "../../assets/japan.jpg";
 
 const initialState = {
-	login: "",
 	email: "",
 	password: "",
 };
 
-export default function RegisterScreen() {
+export default function LoginScreen() {
 	const navigation = useNavigation();
 	const [isShownKB, setIsShownKB] = useState(false);
 	const [state, setState] = useState(initialState);
@@ -47,7 +47,7 @@ export default function RegisterScreen() {
 					<KeyboardAvoidingView
 						style={styles.keyboardView}
 						behavior={Platform.OS === "ios" && "padding"}>
-						<Text style={styles.text}>Register Screen</Text>
+						<Text style={styles.text}>Login Screen</Text>
 						<View
 							style={{
 								...styles.form,
@@ -55,20 +55,6 @@ export default function RegisterScreen() {
 								// width: dimensions,
 							}}>
 							<View>
-								<Text style={styles.inputTitle}>Login</Text>
-								<TextInput
-									value={state.login}
-									style={styles.input}
-									onFocus={() => setIsShownKB(true)}
-									onChangeText={(value) => {
-										setState((prevState) => {
-											return { ...prevState, login: value };
-										});
-									}}
-								/>
-							</View>
-
-							<View style={{ marginTop: 20 }}>
 								<Text style={styles.inputTitle}>Email address</Text>
 								<TextInput
 									value={state.email}
@@ -97,19 +83,32 @@ export default function RegisterScreen() {
 								/>
 							</View>
 							<TouchableOpacity
-								activeOpacity={0.9}
+								activeOpacity={0.8}
 								style={styles.btn}
 								onPress={submitForm}>
-								<Text style={styles.btnText}>SIGN UP</Text>
+								<Text style={styles.btnText}>SIGN IN</Text>
 							</TouchableOpacity>
 
 							<TouchableOpacity
-								activeOpacity={0.9}
-								style={styles.btn}
+								activeOpacity={0.6}
+								style={{
+									flexDirection: "row",
+									alignItems: "center",
+									justifyContent: "center",
+								}}
 								onPress={() => {
-									navigation.navigate("Login");
+									navigation.navigate("Register");
 								}}>
-								<Text style={styles.btnText}>Go to login</Text>
+								<Text
+									style={{
+										color: "red",
+									}}>
+									Not register?
+								</Text>
+								<Text
+									style={[styles.btnText, { color: "black", marginLeft: 6 }]}>
+									Go to Register
+								</Text>
 							</TouchableOpacity>
 						</View>
 					</KeyboardAvoidingView>
@@ -163,7 +162,7 @@ const styles = StyleSheet.create({
 		fontSize: 24,
 	},
 	btn: {
-		marginTop: 20,
+		marginVertical: 20,
 		backgroundColor: "blue",
 		height: 40,
 		alignItems: "center",
