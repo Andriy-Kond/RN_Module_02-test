@@ -3,15 +3,22 @@ import { Camera, CameraType } from "expo-camera";
 import { useEffect, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 
+import * as Location from "expo-location";
+
 import Modal from "react-native-modal";
 
 export default function CreateScreen() {
-	const [permission, setPermission] = useState(null);
-	// const [permission, requestPermission] = Camera.useCameraPermissions(); //? why don't work
+	const [permissionCamera, setPermissionCamera] = useState(null);
+	// const [permissionCamera, requestPermissionCamera] = Camera.useCameraPermissions(); //? why don't work
 	const cameraRef = useRef(null); // reference on camera in DOM
 
+	const [permissionLocation, setPermissionLocation] = useState(null);
+
 	const [prevCapturedPhoto, setPrevCapturedPhoto] = useState(null);
+
 	const [capturedPhoto, setCapturedPhoto] = useState(null); // photo object
+
+	const [capturedLocation, setCapturedLocation] = useState(null);
 
 	const [showMessage, setShowMessage] = useState(false);
 	const [modalMessage, setModalMessage] = useState("");
@@ -31,10 +38,12 @@ export default function CreateScreen() {
 
 	useEffect(() => {
 		(async () => {
-			const { status } = await Camera.requestCameraPermissionsAsync();
-			setPermission(status === "granted");
+			const camera = await Camera.requestCameraPermissionsAsync();
+			setPermissionCamera(camera.status === "granted");
+			const location = await Location.requestForegroundPermissionsAsync();
+			setPermissionLocation(location.status === "granted");
 		})();
-	}, [permission]);
+	}, [permissionCamera, permissionLocation]);
 
 	function toggleCameraType() {
 		setType((current) =>
@@ -50,8 +59,14 @@ export default function CreateScreen() {
 				exif: false,
 			};
 
+			setPrevCapturedPhoto(capturedPhoto);
+
 			const photo = await cameraRef.current.takePictureAsync(options);
 			setCapturedPhoto(photo);
+
+			const location = await Location.getCurrentPositionAsync();
+			console.log("takePhoto >> location:", location);
+			setCapturedLocation(location);
 		}
 	};
 
@@ -72,10 +87,16 @@ export default function CreateScreen() {
 		}
 	};
 
-	if (permission === null) {
+	if (permissionCamera === null) {
 		return <Text>Очікую доступу до камери...</Text>;
-	} else if (!permission) {
+	} else if (!permissionCamera) {
 		return <Text>Немає доступу до камери</Text>;
+	}
+
+	if (permissionLocation === null) {
+		return <Text>Очікую доступу до геолокації...</Text>;
+	} else if (!permissionLocation) {
+		return <Text>Немає доступу до геолокації</Text>;
 	}
 
 	return (
