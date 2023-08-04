@@ -10,35 +10,26 @@ import CreateScreen from "../screens/tabs/CreateScreen";
 import ProfileScreen from "../screens/tabs/ProfileScreen";
 
 // icons
-import { MaterialIcons } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { SimpleLineIcons } from "@expo/vector-icons";
 
 const MainStack = createStackNavigator();
+const TabNav = createBottomTabNavigator();
+
 function AuthNavigation() {
 	return (
 		<MainStack.Navigator screenOptions={{ headerShown: false }}>
-			<MainStack.Screen
-				// options={{ headerShown: false }}
-				name="Register"
-				component={RegisterScreen}
-			/>
-			<MainStack.Screen
-				// options={{ headerShown: false }}
-				name="Login"
-				component={LoginScreen}
-			/>
+			<MainStack.Screen name="Register" component={RegisterScreen} />
+			<MainStack.Screen name="Login" component={LoginScreen} />
 		</MainStack.Navigator>
 	);
 }
 
-const TabNav = createBottomTabNavigator();
 function TabsNavigation() {
 	return (
 		<TabNav.Navigator
 			screenOptions={{ tabBarShowLabel: false, headerShown: false }}>
-			{/* <TabNav.Screen name="Home" component={HomeScreen} /> */}
 			<TabNav.Screen
 				name="PostScreen"
 				component={PostScreen}
@@ -74,6 +65,6 @@ function TabsNavigation() {
 	);
 }
 
-export const useRoute = (isAuth) => {
+export const useMyRoutes = (isAuth) => {
 	return isAuth ? <AuthNavigation /> : <TabsNavigation />;
 };

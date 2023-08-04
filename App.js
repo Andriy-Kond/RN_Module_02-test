@@ -8,7 +8,7 @@ import medium500 from "./assets/fonts/Roboto-Medium-500.ttf";
 import bold700 from "./assets/fonts/Roboto-Bold-700.ttf";
 
 // components
-import { useRoute } from "./utils/router";
+import { useMyRoutes } from "./utils/router";
 
 export default function App() {
 	const [fontsLoaded] = useFonts({
@@ -18,7 +18,7 @@ export default function App() {
 		bold700,
 	});
 
-	const routing = useRoute(null);
+	const routing = useMyRoutes(null);
 
 	if (!fontsLoaded) {
 		return null;
