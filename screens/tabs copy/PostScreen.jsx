@@ -4,7 +4,10 @@ import { useEffect, useState } from "react";
 
 export default function PostScreen() {
 	const [posts, setPosts] = useState([]); // array of photo-objects
+	// console.log("PostScreen >> posts:", posts);
+
 	const { params: capturedPhoto } = useRoute();
+	// console.log("PostScreen >> capturedPhoto:", capturedPhoto);
 
 	useEffect(() => {
 		if (capturedPhoto) {

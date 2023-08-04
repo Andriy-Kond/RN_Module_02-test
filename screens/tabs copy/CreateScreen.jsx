@@ -6,23 +6,22 @@ import { useNavigation } from "@react-navigation/native";
 import Modal from "react-native-modal";
 
 export default function CreateScreen() {
+	// get permissions
 	const [permission, setPermission] = useState(null);
 	// const [permission, requestPermission] = Camera.useCameraPermissions(); //? why don't work
 	const cameraRef = useRef(null); // reference on camera in DOM
 
 	const [prevCapturedPhoto, setPrevCapturedPhoto] = useState(null);
 	const [capturedPhoto, setCapturedPhoto] = useState(null); // photo object
-
+	// console.log("CreateScreen >> capturedPhoto:", capturedPhoto);
 	const [showMessage, setShowMessage] = useState(false);
-	const [modalMessage, setModalMessage] = useState("");
 
-	const showMessagePopup = (message) => {
-		setModalMessage(message);
-		setShowMessage(true);
+	const showMessagePopup = () => {
+		setShowMessage(true); // Відкрити модальне вікно
 	};
 
 	const hideMessagePopup = () => {
-		setShowMessage(false);
+		setShowMessage(false); // Закрити модальне вікно
 	};
 
 	const [type, setType] = useState(CameraType.back);
@@ -61,14 +60,11 @@ export default function CreateScreen() {
 				setPrevCapturedPhoto(capturedPhoto);
 				navigation.navigate("Post", capturedPhoto);
 			} else {
-				showMessagePopup(
-					"Hey dude, it's the same photo. Make a new one, even better, dude..."
-				);
+				showMessagePopup();
+				// console.log(
+				// 	"Hey dude, it's the same photo. Make a new one, even better... :>>"
+				// );
 			}
-		} else {
-			showMessagePopup(
-				"Hey dude, I don't have any photo yet... Tap on SNAP button to take one, dude"
-			);
 		}
 	};
 
@@ -104,9 +100,12 @@ export default function CreateScreen() {
 				</View>
 			</Camera>
 
+			{/* Модальне вікно з повідомленням */}
 			<Modal isVisible={showMessage} onBackdropPress={hideMessagePopup}>
 				<View style={styles.modalContent}>
-					<Text style={styles.modalText}>{modalMessage}</Text>
+					<Text style={styles.modalText}>
+						Hey dude, it's the same photo. Make a new one, even better, dude...
+					</Text>
 					<TouchableOpacity
 						onPress={hideMessagePopup}
 						style={styles.modalButton}>
@@ -164,7 +163,7 @@ const styles = StyleSheet.create({
 		color: "#fff",
 	},
 
-	// Modal styles
+	// Стилі для модального вікна
 	modalContent: {
 		backgroundColor: "white",
 		padding: 20,
