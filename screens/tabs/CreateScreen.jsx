@@ -1,14 +1,21 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Camera, CameraType } from "expo-camera";
 import { useEffect, useRef, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 
 export default function CreateScreen() {
 	// get permissions
 	const [permission, setPermission] = useState(null);
 	// const [permission, requestPermission] = Camera.useCameraPermissions(); //? why don't work
 	const cameraRef = useRef(null); // reference on camera in DOM
+
+	const [prevCapturedPhoto, setPrevCapturedPhoto] = useState(null);
 	const [capturedPhoto, setCapturedPhoto] = useState(null); // photo object
+
+	console.log("CreateScreen >> capturedPhoto:", capturedPhoto);
 	const [type, setType] = useState(CameraType.back);
+
+	const navigation = useNavigation();
 
 	useEffect(() => {
 		(async () => {
@@ -36,6 +43,19 @@ export default function CreateScreen() {
 		}
 	};
 
+	const sendPhoto = () => {
+		if (capturedPhoto) {
+			if (capturedPhoto.uri !== prevCapturedPhoto?.uri) {
+				setPrevCapturedPhoto(capturedPhoto);
+				navigation.navigate("Post", capturedPhoto);
+			} else {
+				console.log(
+					"Hey dude, it's the same photo. Make a new one, even better... :>>"
+				);
+			}
+		}
+	};
+
 	if (permission === null) {
 		return <Text>Очікую доступу до камери...</Text>;
 	} else if (!permission) {
@@ -54,12 +74,16 @@ export default function CreateScreen() {
 				)}
 
 				<View style={styles.buttonContainer}>
+					<TouchableOpacity style={styles.button} onPress={toggleCameraType}>
+						<Text style={styles.text}>Flip Camera</Text>
+					</TouchableOpacity>
+
 					<TouchableOpacity style={styles.button} onPress={takePhoto}>
 						<Text style={styles.text}>SNAP</Text>
 					</TouchableOpacity>
 
-					<TouchableOpacity style={styles.button} onPress={toggleCameraType}>
-						<Text style={styles.text}>Flip Camera</Text>
+					<TouchableOpacity style={styles.button} onPress={sendPhoto}>
+						<Text style={styles.text}>SEND PHOTO</Text>
 					</TouchableOpacity>
 				</View>
 			</Camera>

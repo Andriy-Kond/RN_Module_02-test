@@ -31,7 +31,7 @@ function TabsNavigation() {
 		<TabNav.Navigator
 			screenOptions={{ tabBarShowLabel: false, headerShown: false }}>
 			<TabNav.Screen
-				name="PostScreen"
+				name="Post"
 				component={PostScreen}
 				options={{
 					tabBarIcon: ({ focused, color, size }) => (
@@ -44,7 +44,7 @@ function TabsNavigation() {
 				}}
 			/>
 			<TabNav.Screen
-				name="CreateScreen"
+				name="Create"
 				component={CreateScreen}
 				options={{
 					tabBarIcon: ({ focused, color, size }) => (
@@ -53,7 +53,7 @@ function TabsNavigation() {
 				}}
 			/>
 			<TabNav.Screen
-				name="ProfileScreen"
+				name="Profile"
 				component={ProfileScreen}
 				options={{
 					tabBarIcon: ({ focused, color, size }) => (
