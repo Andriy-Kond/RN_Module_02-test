@@ -74,7 +74,7 @@ export default function CreateScreen() {
 		if (capturedPhoto) {
 			if (capturedPhoto.uri !== prevCapturedPhoto?.uri) {
 				setPrevCapturedPhoto(capturedPhoto);
-				navigation.navigate("Post", capturedPhoto);
+				navigation.navigate("DefaultScreenPosts", capturedPhoto);
 			} else {
 				showMessagePopup(
 					"Hey dude, it's the same photo. Make a new one, even better, dude..."

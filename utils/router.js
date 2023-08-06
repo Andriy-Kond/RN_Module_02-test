@@ -14,23 +14,23 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { SimpleLineIcons } from "@expo/vector-icons";
 
-const MainStack = createStackNavigator();
-const TabNav = createBottomTabNavigator();
+const AuthStack = createStackNavigator();
+const MainStack = createBottomTabNavigator();
 
 function AuthNavigation() {
 	return (
-		<MainStack.Navigator screenOptions={{ headerShown: false }}>
-			<MainStack.Screen name="Register" component={RegisterScreen} />
-			<MainStack.Screen name="Login" component={LoginScreen} />
-		</MainStack.Navigator>
+		<AuthStack.Navigator screenOptions={{ headerShown: false }}>
+			<AuthStack.Screen name="Register" component={RegisterScreen} />
+			<AuthStack.Screen name="Login" component={LoginScreen} />
+		</AuthStack.Navigator>
 	);
 }
 
 function TabsNavigation() {
 	return (
-		<TabNav.Navigator
+		<MainStack.Navigator
 			screenOptions={{ tabBarShowLabel: false, headerShown: false }}>
-			<TabNav.Screen
+			<MainStack.Screen
 				name="Post"
 				component={PostScreen}
 				options={{
@@ -43,7 +43,7 @@ function TabsNavigation() {
 					),
 				}}
 			/>
-			<TabNav.Screen
+			<MainStack.Screen
 				name="Create"
 				component={CreateScreen}
 				options={{
@@ -52,7 +52,7 @@ function TabsNavigation() {
 					),
 				}}
 			/>
-			<TabNav.Screen
+			<MainStack.Screen
 				name="Profile"
 				component={ProfileScreen}
 				options={{
@@ -61,7 +61,7 @@ function TabsNavigation() {
 					),
 				}}
 			/>
-		</TabNav.Navigator>
+		</MainStack.Navigator>
 	);
 }
 

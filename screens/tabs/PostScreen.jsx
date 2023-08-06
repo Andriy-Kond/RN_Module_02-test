@@ -1,83 +1,21 @@
-import {
-	FlatList,
-	Image,
-	StyleSheet,
-	Text,
-	TouchableOpacity,
-	View,
-} from "react-native";
-import { useRoute } from "@react-navigation/native";
-import { useEffect, useState } from "react";
+import { createStackNavigator } from "@react-navigation/stack";
 
-export default function PostScreen() {
-	const [posts, setPosts] = useState([]); // array of photo-objects
+const NestedStack = createStackNavigator();
 
-	const { params: capturedPhoto } = useRoute();
+// screens
+import DefaultScreenPosts from "../tabsNested/DefaultScreenPosts";
+import MapScreen from "../tabsNested/MapScreen";
+import CommentsScreen from "../tabsNested/CommentsScreen";
 
-	useEffect(() => {
-		if (capturedPhoto) {
-			setPosts((prevState) => [...prevState, capturedPhoto]);
-		}
-	}, [capturedPhoto]);
-
+export default function NestedNavigation() {
 	return (
-		<View style={styles.container}>
-			<Text>It is PostScreen</Text>
-			<FlatList
-				data={posts}
-				keyExtractor={(item, indx) => indx.toString()}
-				renderItem={({ item }) => {
-					const indx = posts.indexOf(item);
-					return (
-						<View style={styles.imgContainer}>
-							<Text Style={styles.imgTitle}>Image number: {indx + 1}</Text>
-							<Image source={{ uri: item.uri }} style={styles.currentImg} />
-							<View style={styles.btnsWrapper}>
-								<TouchableOpacity>
-									<Text>Go to MAP</Text>
-								</TouchableOpacity>
-
-								<TouchableOpacity>
-									<Text>Go to COMMENTS</Text>
-								</TouchableOpacity>
-							</View>
-						</View>
-					);
-				}}
+		<NestedStack.Navigator screenOptions={{ headerShown: false }}>
+			<NestedStack.Screen
+				name="DefaultScreenPosts"
+				component={DefaultScreenPosts}
 			/>
-		</View>
+			<NestedStack.Screen name="MapScreen" component={MapScreen} />
+			<NestedStack.Screen name="CommentsScreen" component={CommentsScreen} />
+		</NestedStack.Navigator>
 	);
 }
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		paddingHorizontal: 30,
-		paddingVertical: 30,
-	},
-
-	imgContainer: {
-		alignItems: "center",
-		marginBottom: 10,
-	},
-
-	imgTitle: {
-		marginBottom: 100,
-	},
-
-	currentImg: {
-		width: "100%",
-		height: 200,
-		borderRadius: 20,
-		borderColor: "#fff",
-		marginTop: 10,
-		marginBottom: 10,
-	},
-
-	btnsWrapper: {
-		width: "100%",
-		flexDirection: "row",
-		justifyContent: "space-between",
-		paddingHorizontal: 15,
-	},
-});
