@@ -30,12 +30,13 @@ export default function PostScreen() {
 					const indx = posts.indexOf(item);
 					return (
 						<View style={styles.imgContainer}>
+							<Text Style={styles.imgTitle}>Image number: {indx + 1}</Text>
 							<Image source={{ uri: item.uri }} style={styles.currentImg} />
-							<Text>Image number: {indx + 1}</Text>
-							<View style={{ flexDirection: "row" }}>
+							<View style={styles.btnsWrapper}>
 								<TouchableOpacity>
 									<Text>Go to MAP</Text>
 								</TouchableOpacity>
+
 								<TouchableOpacity>
 									<Text>Go to COMMENTS</Text>
 								</TouchableOpacity>
@@ -51,16 +52,32 @@ export default function PostScreen() {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		paddingHorizontal: 15,
+		paddingHorizontal: 30,
+		paddingVertical: 30,
 	},
+
 	imgContainer: {
 		alignItems: "center",
 		marginBottom: 10,
 	},
+
+	imgTitle: {
+		marginBottom: 100,
+	},
+
 	currentImg: {
-		width: 300,
+		width: "100%",
 		height: 200,
 		borderRadius: 20,
 		borderColor: "#fff",
+		marginTop: 10,
+		marginBottom: 10,
+	},
+
+	btnsWrapper: {
+		width: "100%",
+		flexDirection: "row",
+		justifyContent: "space-between",
+		paddingHorizontal: 15,
 	},
 });

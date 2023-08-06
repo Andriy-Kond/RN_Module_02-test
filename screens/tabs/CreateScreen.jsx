@@ -17,7 +17,6 @@ export default function CreateScreen() {
 	const [prevCapturedPhoto, setPrevCapturedPhoto] = useState(null);
 
 	const [capturedPhoto, setCapturedPhoto] = useState(null); // photo object
-
 	const [capturedLocation, setCapturedLocation] = useState(null);
 
 	const [showMessage, setShowMessage] = useState(false);
@@ -40,6 +39,7 @@ export default function CreateScreen() {
 		(async () => {
 			const camera = await Camera.requestCameraPermissionsAsync();
 			setPermissionCamera(camera.status === "granted");
+
 			const location = await Location.requestForegroundPermissionsAsync();
 			setPermissionLocation(location.status === "granted");
 		})();
