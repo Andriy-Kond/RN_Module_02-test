@@ -1,4 +1,11 @@
-import { FlatList, Image, StyleSheet, Text, View } from "react-native";
+import {
+	FlatList,
+	Image,
+	StyleSheet,
+	Text,
+	TouchableOpacity,
+	View,
+} from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 
@@ -19,11 +26,24 @@ export default function PostScreen() {
 			<FlatList
 				data={posts}
 				keyExtractor={(item, indx) => indx.toString()}
-				renderItem={({ item }) => (
-					<View style={styles.imgContainer}>
-						<Image source={{ uri: item.uri }} style={styles.currentImg} />
-					</View>
-				)}></FlatList>
+				renderItem={({ item }) => {
+					const indx = posts.indexOf(item);
+					return (
+						<View style={styles.imgContainer}>
+							<Image source={{ uri: item.uri }} style={styles.currentImg} />
+							<Text>Image number: {indx + 1}</Text>
+							<View style={{ flexDirection: "row" }}>
+								<TouchableOpacity>
+									<Text>Go to MAP</Text>
+								</TouchableOpacity>
+								<TouchableOpacity>
+									<Text>Go to COMMENTS</Text>
+								</TouchableOpacity>
+							</View>
+						</View>
+					);
+				}}
+			/>
 		</View>
 	);
 }
