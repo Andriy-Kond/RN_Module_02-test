@@ -36,6 +36,7 @@ export default function RegisterScreen() {
 		setIsShownKB(false);
 		Keyboard.dismiss();
 		setState(initialState);
+		// console.log('object :>> ', state);
 	};
 
 	return (
@@ -59,6 +60,7 @@ export default function RegisterScreen() {
 								<TextInput
 									value={state.login}
 									style={styles.input}
+									onSubmitEditing={hideKB}
 									onFocus={() => setIsShownKB(true)}
 									onChangeText={(value) => {
 										setState((prevState) => {
@@ -73,6 +75,7 @@ export default function RegisterScreen() {
 								<TextInput
 									value={state.email}
 									style={styles.input}
+									onSubmitEditing={hideKB}
 									onFocus={() => setIsShownKB(true)}
 									onChangeText={(value) => {
 										setState((prevState) => {
@@ -88,6 +91,7 @@ export default function RegisterScreen() {
 									value={state.password}
 									style={styles.input}
 									secureTextEntry
+									onSubmitEditing={hideKB}
 									onFocus={() => setIsShownKB(true)}
 									onChangeText={(value) => {
 										setState((prevState) => {
@@ -96,34 +100,42 @@ export default function RegisterScreen() {
 									}}
 								/>
 							</View>
-							<TouchableOpacity
-								activeOpacity={0.8}
-								style={styles.btn}
-								onPress={submitForm}>
-								<Text style={styles.btnText}>SIGN UP</Text>
-							</TouchableOpacity>
 
-							<TouchableOpacity
-								activeOpacity={0.6}
-								style={{
-									flexDirection: "row",
-									alignItems: "center",
-									justifyContent: "center",
-								}}
-								onPress={() => {
-									navigation.navigate("Login");
-								}}>
-								<Text
-									style={{
-										color: "red",
-									}}>
-									Have login?
-								</Text>
-								<Text
-									style={[styles.btnText, { color: "black", marginLeft: 6 }]}>
-									Go to login
-								</Text>
-							</TouchableOpacity>
+							{!isShownKB && (
+								<>
+									<TouchableOpacity
+										activeOpacity={0.8}
+										style={styles.btn}
+										onPress={submitForm}>
+										<Text style={styles.btnText}>SIGN UP</Text>
+									</TouchableOpacity>
+
+									<TouchableOpacity
+										activeOpacity={0.6}
+										style={{
+											flexDirection: "row",
+											alignItems: "center",
+											justifyContent: "center",
+										}}
+										onPress={() => {
+											navigation.navigate("Login");
+										}}>
+										<Text
+											style={{
+												color: "red",
+											}}>
+											Have login?
+										</Text>
+										<Text
+											style={[
+												styles.btnText,
+												{ color: "black", marginLeft: 6 },
+											]}>
+											Go to login
+										</Text>
+									</TouchableOpacity>
+								</>
+							)}
 						</View>
 					</KeyboardAvoidingView>
 				</ImageBackground>

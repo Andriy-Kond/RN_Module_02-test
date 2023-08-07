@@ -66,5 +66,5 @@ function TabsNavigation() {
 }
 
 export const useMyRoutes = (isAuth) => {
-	return isAuth ? <AuthNavigation /> : <TabsNavigation />;
+	return !isAuth ? <AuthNavigation /> : <TabsNavigation />;
 };

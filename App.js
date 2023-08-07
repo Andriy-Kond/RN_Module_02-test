@@ -1,3 +1,5 @@
+import { Provider } from "react-redux";
+
 // navigation
 import { NavigationContainer } from "@react-navigation/native";
 
@@ -9,6 +11,7 @@ import bold700 from "./assets/fonts/Roboto-Bold-700.ttf";
 
 // components
 import { useMyRoutes } from "./utils/router";
+import { store } from "./redux/store";
 
 export default function App() {
 	const [fontsLoaded] = useFonts({
@@ -18,11 +21,15 @@ export default function App() {
 		bold700,
 	});
 
-	const routing = useMyRoutes(null);
+	const routing = useMyRoutes(false);
 
 	if (!fontsLoaded) {
 		return null;
 	}
 
-	return <NavigationContainer>{routing}</NavigationContainer>;
+	return (
+		<Provider store={store}>
+			<NavigationContainer>{routing}</NavigationContainer>
+		</Provider>
+	);
 }
