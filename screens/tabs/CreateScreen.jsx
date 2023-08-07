@@ -4,18 +4,19 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 
 import * as Location from "expo-location";
+import * as MediaLibrary from "expo-media-library";
 
 import Modal from "react-native-modal";
 
 export default function CreateScreen() {
-	const [permissionCamera, setPermissionCamera] = useState(null);
-	// const [permissionCamera, requestPermissionCamera] = Camera.useCameraPermissions(); //? why don't work
 	const cameraRef = useRef(null); // reference on camera in DOM
 
 	const [permissionLocation, setPermissionLocation] = useState(null);
+	const [permissionMediaLibrary, setPermissionMediaLibrary] = useState(null);
+	const [permissionCamera, setPermissionCamera] = useState(null);
+	// const [permissionCamera, requestPermissionCamera] = Camera.useCameraPermissions(); //? why don't work
 
 	const [prevCapturedPhoto, setPrevCapturedPhoto] = useState(null);
-
 	const [capturedPhoto, setCapturedPhoto] = useState(null); // photo object
 	const [capturedLocation, setCapturedLocation] = useState(null);
 
@@ -42,6 +43,9 @@ export default function CreateScreen() {
 
 			const location = await Location.requestForegroundPermissionsAsync();
 			setPermissionLocation(location.status === "granted");
+
+			const mediaLibrary = await MediaLibrary.requestPermissionsAsync()();
+			setPermissionMediaLibrary(mediaLibrary.status === "granted");
 		})();
 	}, [permissionCamera, permissionLocation]);
 
@@ -63,6 +67,8 @@ export default function CreateScreen() {
 
 			const photo = await cameraRef.current.takePictureAsync(options);
 			setCapturedPhoto(photo);
+
+			await MediaLibrary.createAssetAsync(photo.uri);
 
 			const location = await Location.getCurrentPositionAsync();
 			console.log("takePhoto >> location:", location);

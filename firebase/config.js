@@ -1,26 +1,33 @@
-import * as firebase from "firebase";
-import "firebase/auth";
-
 // Import the functions you need from the SDKs you need
+
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
+// Для роботи із firebase обовʼязково треба ініціалізувати проект
+// import { initializeApp } from 'firebase/app';
+// Функція для підключення авторизації в проект
+import { getAuth } from "firebase/auth";
+// Функція для підключення бази даних у проект
+import { getFirestore } from "firebase/firestore";
+// Функція для підключення сховища файлів в проект
+import { getStorage } from "firebase/storage";
+
 // Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-	apiKey: "AIzaSyAcgnb4yUEIZfNCblfyEW2l1dil8ZVZWak",
-	authDomain: "mn-module-02.firebaseapp.com",
-	projectId: "mn-module-02",
-	storageBucket: "mn-module-02.appspot.com",
-	messagingSenderId: "14936246772",
-	appId: "1:14936246772:web:5d19420ad749659f1991a1",
-	measurementId: "G-G77JHJX7QD",
+	apiKey: "AIzaSyCW8lzM62vHdggVzar-ooh6XeVnbCFhS74",
+	authDomain: "rn-module.firebaseapp.com",
+	projectId: "rn-module",
+	storageBucket: "rn-module.appspot.com",
+	messagingSenderId: "407439418647",
+	appId: "1:407439418647:web:993137c7182d132bb54352",
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+// export default app = initializeApp(firebaseConfig);
 
-export default firebase;
+const app = initializeApp(firebaseConfig);
+
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+export const storage = getStorage(app);

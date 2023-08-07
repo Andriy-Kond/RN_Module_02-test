@@ -14,10 +14,18 @@ import {
 	TouchableWithoutFeedback,
 } from "react-native";
 
+import { useDispatch } from "react-redux";
+
 import backGroundImage from "../../assets/japan.jpg";
 
+import {
+	authSingOutUser,
+	authSingInUser,
+	authSingUpUser,
+} from "../../redux/auth/authOperations";
+
 const initialState = {
-	login: "",
+	nickname: "",
 	email: "",
 	password: "",
 };
@@ -26,6 +34,8 @@ export default function RegisterScreen() {
 	const navigation = useNavigation();
 	const [isShownKB, setIsShownKB] = useState(false);
 	const [state, setState] = useState(initialState);
+
+	const dispatch = useDispatch();
 
 	const hideKB = () => {
 		setIsShownKB(false);
@@ -37,6 +47,7 @@ export default function RegisterScreen() {
 		Keyboard.dismiss();
 		setState(initialState);
 		// console.log('object :>> ', state);
+		dispatch(authSingUpUser(state));
 	};
 
 	return (
