@@ -15,14 +15,13 @@ import {
 } from "react-native";
 
 import { useDispatch } from "react-redux";
-
-import backGroundImage from "../../assets/japan.jpg";
-
 import {
 	authSingOutUser,
 	authSingInUser,
 	authSingUpUser,
 } from "../../redux/auth/authOperations";
+
+import backGroundImage from "../../assets/japan.jpg";
 
 const initialState = {
 	nickname: "",
@@ -45,9 +44,8 @@ export default function RegisterScreen() {
 	const submitForm = () => {
 		setIsShownKB(false);
 		Keyboard.dismiss();
-		setState(initialState);
-		// console.log('object :>> ', state);
 		dispatch(authSingUpUser(state));
+		setState(initialState);
 	};
 
 	return (
@@ -69,13 +67,13 @@ export default function RegisterScreen() {
 							<View>
 								<Text style={styles.inputTitle}>Login</Text>
 								<TextInput
-									value={state.login}
+									value={state.nickname}
 									style={styles.input}
 									onSubmitEditing={hideKB}
 									onFocus={() => setIsShownKB(true)}
 									onChangeText={(value) => {
 										setState((prevState) => {
-											return { ...prevState, login: value };
+											return { ...prevState, nickname: value };
 										});
 									}}
 								/>
@@ -194,10 +192,9 @@ const styles = StyleSheet.create({
 		borderColor: "black",
 		paddingHorizontal: 20,
 		borderRadius: 10,
-		color: "green",
+		color: "orange",
 		textAlign: "center",
 		fontSize: 24,
-		// width: "100%",
 	},
 	btn: {
 		marginVertical: 20,

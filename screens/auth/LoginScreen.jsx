@@ -15,6 +15,9 @@ import {
 	TouchableWithoutFeedback,
 } from "react-native";
 
+import { useDispatch } from "react-redux";
+import { authSingInUser } from "../../redux/auth/authOperations";
+
 import backGroundImage from "../../assets/japan.jpg";
 
 const initialState = {
@@ -23,6 +26,7 @@ const initialState = {
 };
 
 export default function LoginScreen() {
+	const dispatch = useDispatch();
 	const navigation = useNavigation();
 	const [isShownKB, setIsShownKB] = useState(false);
 	const [state, setState] = useState(initialState);
@@ -35,6 +39,7 @@ export default function LoginScreen() {
 	const submitForm = () => {
 		setIsShownKB(false);
 		Keyboard.dismiss();
+		dispatch(authSingInUser(state));
 		setState(initialState);
 	};
 
@@ -67,7 +72,6 @@ export default function LoginScreen() {
 									}}
 								/>
 							</View>
-
 							<View style={{ marginTop: 20 }}>
 								<Text style={styles.inputTitle}>Password</Text>
 								<TextInput
@@ -82,34 +86,40 @@ export default function LoginScreen() {
 									}}
 								/>
 							</View>
-							<TouchableOpacity
-								activeOpacity={0.8}
-								style={styles.btn}
-								onPress={submitForm}>
-								<Text style={styles.btnText}>SIGN IN</Text>
-							</TouchableOpacity>
-
-							<TouchableOpacity
-								activeOpacity={0.6}
-								style={{
-									flexDirection: "row",
-									alignItems: "center",
-									justifyContent: "center",
-								}}
-								onPress={() => {
-									navigation.navigate("Register");
-								}}>
-								<Text
-									style={{
-										color: "red",
-									}}>
-									Not register?
-								</Text>
-								<Text
-									style={[styles.btnText, { color: "black", marginLeft: 6 }]}>
-									Go to Register
-								</Text>
-							</TouchableOpacity>
+							{!isShownKB && (
+								<>
+									<TouchableOpacity
+										activeOpacity={0.8}
+										style={styles.btn}
+										onPress={submitForm}>
+										<Text style={styles.btnText}>SIGN IN</Text>
+									</TouchableOpacity>
+									<TouchableOpacity
+										activeOpacity={0.6}
+										style={{
+											flexDirection: "row",
+											alignItems: "center",
+											justifyContent: "center",
+										}}
+										onPress={() => {
+											navigation.navigate("Register");
+										}}>
+										<Text
+											style={{
+												color: "red",
+											}}>
+											Not register?
+										</Text>
+										<Text
+											style={[
+												styles.btnText,
+												{ color: "black", marginLeft: 6 },
+											]}>
+											Go to Register
+										</Text>
+									</TouchableOpacity>
+								</>
+							)}
 						</View>
 					</KeyboardAvoidingView>
 				</ImageBackground>

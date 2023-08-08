@@ -44,7 +44,7 @@ export default function CreateScreen() {
 			const location = await Location.requestForegroundPermissionsAsync();
 			setPermissionLocation(location.status === "granted");
 
-			const mediaLibrary = await MediaLibrary.requestPermissionsAsync()();
+			const mediaLibrary = await MediaLibrary.requestPermissionsAsync();
 			setPermissionMediaLibrary(mediaLibrary.status === "granted");
 		})();
 	}, [permissionCamera, permissionLocation]);
