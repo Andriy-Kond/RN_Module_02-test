@@ -29,8 +29,6 @@ export default function CreateScreen() {
 		setShowMessage(true);
 	};
 
-	authorization;
-
 	const hideMessagePopup = () => {
 		setShowMessage(false);
 	};
