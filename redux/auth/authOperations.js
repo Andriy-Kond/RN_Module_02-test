@@ -5,22 +5,11 @@ import {
 	signInWithEmailAndPassword,
 	onAuthStateChanged,
 	updateProfile,
+	signOut,
 } from "firebase/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { auth } from "../../firebase/config";
 import { authSlice } from "./authReducer";
-
-// export const authSingUpUser =
-// 	({ email, password, nickname }) =>
-// 	async (dispatch, getState) => {
-// 		try {
-// 			const user = await createUserWithEmailAndPassword(auth, email, password);
-// 			dispatch(authSlice.actions.updateUserProfile({ userId: user.user.uid }));
-// 		} catch (error) {
-// 			console.log("authSingUpUser >> error:", error);
-// 			console.log("authSingUpUser >> error.message:", error.message);
-// 		}
-// 	};
 
 export const authSingUpUser = ({ email, password, nickname }) => {
 	return async (dispatch) => {
@@ -31,10 +20,8 @@ export const authSingUpUser = ({ email, password, nickname }) => {
 				password
 			);
 
-			const user = auth.currentUser;
-			console.log("user ::", user);
-			if (user) {
-				await updateProfile(user, {
+			if (userCredential?.user) {
+				await updateProfile(userCredential.user, {
 					displayName: nickname,
 				});
 			}
@@ -52,11 +39,9 @@ export const authSingUpUser = ({ email, password, nickname }) => {
 				})
 			);
 		} catch (error) {
-			const errorCode = error.code;
-			const errorMessage = error.message;
-			console.log("error ::", error);
-			console.log("authSingUpUser > errorCode ::", errorCode);
-			console.log("authSingUpUser > errorMessage ::", errorMessage);
+			console.log("authSingUpUser >> error:", error);
+			console.log("authSingUpUser >> errorCode:", error.code);
+			console.log("authSingUpUser >> errorMessage:", error.message);
 		}
 	};
 };
@@ -65,73 +50,30 @@ export const authSingInUser =
 	({ email, password }) =>
 	async (dispatch, getState) => {
 		try {
-			const user = await signInWithEmailAndPassword(auth, email, password);
+			await signInWithEmailAndPassword(auth, email, password);
 		} catch (error) {
 			console.log("authSingInUser >> error:", error);
-			console.log("authSingInUser >> error.message:", error.message);
+			console.log("authSingInUser >> errorCode:", error.code);
+			console.log("authSingInUser >> errorMessage:", error.message);
 		}
 	};
 
-// export const onAuthStateChanged =
-// 	({ email, password, nickname }) =>
-// 	async (dispatch, getState) => {
-// 		try {
-// 			const user = onAuthStateChanged(auth, email, password);
-// 			console.log("user ::", user);
-// 		} catch (error) {
-// 			console.log("authSingUpUser >> error:", error);
-// 			console.log("authSingUpUser >> error.message:", error.message);
-// 		}
-// 	};
+export const authStateChangeUser = () => async (dispatch, getState) => {
+	await onAuthStateChanged(auth, (user) => {
+		if (user) {
+			dispatch(
+				authSlice.actions.updateUserProfile({
+					userId: user.uid,
+					nickname: user.displayName,
+				})
+			);
 
-// export const authSingOutUser =
-// 	({ email, password, nickname }) =>
-// 	async (dispatch, getState) => {
-// 		try {
-// 			const user = await createUserWithEmailAndPassword(auth, email, password);
-// 			console.log("user ::", user);
-// 		} catch (error) {
-// 			console.log("authSingUpUser >> error:", error);
-// 			console.log("authSingUpUser >> error.message:", error.message);
-// 		}
-// 	};
+			dispatch(authSlice.actions.updateStateChange({ stateChange: true }));
+		}
+	});
+};
 
-// const registerDB = async ({ email, password }) => {
-// 	try {
-// 		await createUserWithEmailAndPassword(auth, email, password);
-// 	} catch (error) {
-// 		throw error;
-// 	}
-// };
-
-// const registerDB = ({ email, password }) =>
-// 	createUserWithEmailAndPassword(auth, email, password);
-
-// const authStateChanged = async (onChange = () => {}) => {
-// 	onAuthStateChanged((user) => {
-// 		onChange(user);
-// 	});
-// };
-
-// const loginDB = async ({ email, password }) => {
-// 	try {
-// 		const credentials = await signInWithEmailAndPassword(auth, email, password);
-// 		return credentials.user;
-// 	} catch (error) {
-// 		throw error;
-// 	}
-// };
-
-// const updateUserProfile = async (update) => {
-// 	const user = auth.currentUser;
-
-// 	// якщо такий користувач знайдений
-// 	if (user) {
-// 		// оновлюємо його профайл
-// 		try {
-// 			await updateProfile(user, update);
-// 		} catch (error) {
-// 			throw error;
-// 		}
-// 	}
-// };
+export const authSingOutUser = () => async (dispatch, getState) => {
+	await signOut(auth);
+	await dispatch(authSlice.actions.authSingOut());
+};

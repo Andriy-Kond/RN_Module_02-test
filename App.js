@@ -18,6 +18,7 @@ import { useState } from "react";
 
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase/config";
+import Main from "./components/Main";
 
 export default function App() {
 	const [fontsLoaded] = useFonts({
@@ -29,17 +30,17 @@ export default function App() {
 
 	// const dispatch = useDispatch();
 
-	const [user, setUser] = useState(null);
-	console.log("App >>> user ::", user);
+	// const [user, setUser] = useState(null);
+	// console.log("App >>> user ::", user);
 
-	onAuthStateChanged(auth, (user) => {
-		setUser(user);
+	// onAuthStateChanged(auth, (user) => {
+	// 	setUser(user);
 
-		// const uid = user.uid;
-		// console.log("user >>> uid ::", uid);
-	});
+	// const uid = user.uid;
+	// console.log("user >>> uid ::", uid);
+	// });
 
-	const routing = useMyRoutes(user);
+	// const routing = useMyRoutes(user);
 
 	if (!fontsLoaded) {
 		return null;
@@ -47,7 +48,8 @@ export default function App() {
 
 	return (
 		<Provider store={store}>
-			<NavigationContainer>{routing}</NavigationContainer>
+			{/* <NavigationContainer>{routing}</NavigationContainer> */}
+			<Main></Main>
 		</Provider>
 	);
 }

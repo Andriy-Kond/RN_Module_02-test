@@ -13,13 +13,24 @@ export default function NestedNavigation() {
 	// console.log("state01 :>> 01", state01);
 
 	return (
-		<NestedStack.Navigator screenOptions={{ headerShown: false }}>
+		<NestedStack.Navigator
+		// screenOptions={{ headerShown: false }}
+		>
 			<NestedStack.Screen
 				name="DefaultScreenPosts"
 				component={DefaultScreenPosts}
+				options={{ headerShown: false }}
 			/>
-			<NestedStack.Screen name="MapScreen" component={MapScreen} />
-			<NestedStack.Screen name="CommentsScreen" component={CommentsScreen} />
+			<NestedStack.Screen
+				name="MapScreen"
+				component={MapScreen}
+				options={{ title: "Map" }}
+			/>
+			<NestedStack.Screen
+				name="CommentsScreen"
+				component={CommentsScreen}
+				options={{ title: "Comments" }}
+			/>
 		</NestedStack.Navigator>
 	);
 }

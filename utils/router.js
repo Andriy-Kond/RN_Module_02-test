@@ -20,8 +20,8 @@ const MainStack = createBottomTabNavigator();
 function AuthNavigation() {
 	return (
 		<AuthStack.Navigator screenOptions={{ headerShown: false }}>
-			<AuthStack.Screen name="Register" component={RegisterScreen} />
 			<AuthStack.Screen name="Login" component={LoginScreen} />
+			<AuthStack.Screen name="Register" component={RegisterScreen} />
 		</AuthStack.Navigator>
 	);
 }

@@ -9,25 +9,29 @@ import { State } from "react-native-gesture-handler";
 // Extract and export each action creator by name
 // export const { createPost, updatePost, deletePost } = actions
 
+const initState = {
+	userId: null,
+	nickname: null,
+	stateChange: false,
+};
+
+const actions = {
+	updateUserProfile: (state, action) => ({
+		...state,
+		userId: action.payload.userId,
+		nickname: action.payload.nickname,
+	}),
+
+	updateStateChange: (state, action) => ({
+		...state,
+		stateChange: action.payload.stateChange,
+	}),
+
+	authSingOut: (state, action) => initState,
+};
+
 export const authSlice = createSlice({
 	name: "auth",
-	initialState: {
-		userId: null,
-		nickname: null,
-		stateChange: null,
-	},
-	reducers: {
-		// it is actions:
-		updateUserProfile: (state, action) => ({
-			...state,
-			userId: action.payload.userId,
-			nickname: action.payload.nickname,
-		}),
-
-		updateStateChange: (state, action) => ({
-			...state,
-			stateChange: action.payload.stateChange,
-		}),
-	},
+	initialState: initState,
+	reducers: actions,
 });
-console.log("authSlice ::", authSlice);

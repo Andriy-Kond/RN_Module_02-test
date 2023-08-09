@@ -1,3 +1,4 @@
+// TODO: save photo on phone storage
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Camera, CameraType } from "expo-camera";
 import { useEffect, useRef, useState } from "react";
@@ -28,6 +29,8 @@ export default function CreateScreen() {
 		setShowMessage(true);
 	};
 
+	authorization;
+
 	const hideMessagePopup = () => {
 		setShowMessage(false);
 	};
@@ -36,6 +39,7 @@ export default function CreateScreen() {
 
 	const navigation = useNavigation();
 
+	// request accesses camera, location, mediaLibrary
 	useEffect(() => {
 		(async () => {
 			const camera = await Camera.requestCameraPermissionsAsync();
@@ -47,7 +51,7 @@ export default function CreateScreen() {
 			const mediaLibrary = await MediaLibrary.requestPermissionsAsync();
 			setPermissionMediaLibrary(mediaLibrary.status === "granted");
 		})();
-	}, [permissionCamera, permissionLocation]);
+	}, [permissionCamera, permissionLocation, permissionMediaLibrary]);
 
 	function toggleCameraType() {
 		setType((current) =>
@@ -71,7 +75,7 @@ export default function CreateScreen() {
 			await MediaLibrary.createAssetAsync(photo.uri);
 
 			const location = await Location.getCurrentPositionAsync();
-			console.log("takePhoto >> location:", location);
+			// console.log("takePhoto >> location:", location);
 			setCapturedLocation(location);
 		}
 	};
