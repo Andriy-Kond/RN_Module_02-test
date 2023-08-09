@@ -22,11 +22,8 @@ import { authSlice } from "./authReducer";
 // 		}
 // 	};
 
-export const authSingUpUser =
-	({ email, password, nickname }) =>
-	async (dispatch) => {
-		const state = useSelector((state) => state.auth.nickname);
-		console.log("state :>> 01", state);
+export const authSingUpUser = ({ email, password, nickname }) => {
+	return async (dispatch) => {
 		try {
 			const userCredential = await createUserWithEmailAndPassword(
 				auth,
@@ -47,7 +44,7 @@ export const authSingUpUser =
 			// 	email,
 			// 	password
 			// );
-			console.log("state :>> 02", state);
+
 			dispatch(
 				authSlice.actions.updateUserProfile({
 					userId: userCredential.user.uid,
@@ -62,6 +59,7 @@ export const authSingUpUser =
 			console.log("authSingUpUser > errorMessage ::", errorMessage);
 		}
 	};
+};
 
 export const authSingInUser =
 	({ email, password }) =>
