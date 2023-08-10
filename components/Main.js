@@ -10,9 +10,9 @@ const Main = () => {
 	const stateChange = useSelector((state) => state.auth.stateChange);
 	const userId = useSelector((state) => state.auth.userId);
 	const nickname = useSelector((state) => state.auth.nickname);
-	console.log("Main >> userId:", userId);
-	console.log("Main >> nickname:", nickname);
-	console.log("Main >> select:", stateChange);
+	// console.log("Main >> userId:", userId);
+	// console.log("Main >> nickname:", nickname);
+	// console.log("Main >> select:", stateChange);
 
 	useEffect(() => {
 		dispatch(authStateChangeUser());

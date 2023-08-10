@@ -8,6 +8,7 @@ import * as Location from "expo-location";
 import * as MediaLibrary from "expo-media-library";
 
 import Modal from "react-native-modal";
+import { writeDataToFirestore } from "../../utils/writeDataToFirestore";
 
 export default function CreateScreen() {
 	const cameraRef = useRef(null); // reference on camera in DOM
@@ -62,7 +63,7 @@ export default function CreateScreen() {
 			const options = {
 				quality: 1,
 				base64: true,
-				exif: false,
+				// exif: false,
 			};
 
 			setPrevCapturedPhoto(capturedPhoto);
@@ -83,6 +84,7 @@ export default function CreateScreen() {
 			if (capturedPhoto.uri !== prevCapturedPhoto?.uri) {
 				setPrevCapturedPhoto(capturedPhoto);
 				navigation.navigate("DefaultScreenPosts", capturedPhoto);
+				uploadPhotoToServer();
 			} else {
 				showMessagePopup(
 					"Hey dude, it's the same photo. Make a new one, even better, dude..."
@@ -93,6 +95,10 @@ export default function CreateScreen() {
 				"Hey dude, I don't have any photo yet... Tap on SNAP button to take one, dude"
 			);
 		}
+	};
+
+	const uploadPhotoToServer = async () => {
+		await writeDataToFirestore(capturedPhoto);
 	};
 
 	if (permissionCamera === null) {

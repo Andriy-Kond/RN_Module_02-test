@@ -11,6 +11,8 @@ import { getStorage } from "firebase/storage";
 const firebaseConfig = {
 	apiKey: "AIzaSyCW8lzM62vHdggVzar-ooh6XeVnbCFhS74",
 	authDomain: "rn-module.firebaseapp.com",
+	databaseURL:
+		"https://rn-module-default-rtdb.europe-west1.firebasedatabase.app",
 	projectId: "rn-module",
 	storageBucket: "rn-module.appspot.com",
 	messagingSenderId: "407439418647",

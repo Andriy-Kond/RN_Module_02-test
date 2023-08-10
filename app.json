@@ -1,7 +1,7 @@
 {
 	"expo": {
-		"name": "RN_Module_02",
-		"slug": "RN_Module_02",
+		"name": "rn-module",
+		"slug": "rn-module",
 		"version": "1.0.0",
 		"orientation": "default",
 		"icon": "./assets/icon.png",
@@ -12,6 +12,7 @@
 			"backgroundColor": "#ffffff"
 		},
 		"assetBundlePatterns": ["**/*"],
+
 		"ios": {
 			"supportsTablet": true
 		},
