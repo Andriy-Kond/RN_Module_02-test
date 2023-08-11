@@ -25,7 +25,6 @@ export default function CreateScreen() {
 	const [prevCapturedPhoto, setPrevCapturedPhoto] = useState(null);
 	const [capturedPhoto, setCapturedPhoto] = useState(null); // photo link
 	const [capturedLocation, setCapturedLocation] = useState(null);
-	console.log("CreateScreen >> capturedLocation:", capturedLocation);
 
 	const [showMessage, setShowMessage] = useState(false);
 	const [modalMessage, setModalMessage] = useState("");
@@ -73,14 +72,11 @@ export default function CreateScreen() {
 
 			setPrevCapturedPhoto(capturedPhoto);
 			const photo = await cameraRef.current.takePictureAsync();
-			console.log("takePhoto >> photo:", photo);
 			setCapturedPhoto(photo.uri);
 
-			const media = await MediaLibrary.createAssetAsync(photo.uri);
-			console.log("takePhoto >> media:", media);
+			await MediaLibrary.createAssetAsync(photo.uri);
 
 			const location = await Location.getCurrentPositionAsync();
-			console.log("takePhoto >> location:", location);
 			setCapturedLocation(location);
 		}
 	};
@@ -88,8 +84,6 @@ export default function CreateScreen() {
 	const sendPhoto = async () => {
 		if (capturedPhoto) {
 			if (capturedPhoto !== prevCapturedPhoto) {
-				console.log("sendPhoto >> capturedPhoto:", capturedPhoto);
-				console.log("sendPhoto >> capturedLocation:", capturedLocation);
 				setPrevCapturedPhoto(capturedPhoto);
 				navigation.navigate("DefaultScreenPosts", {
 					capturedPhoto,
@@ -109,8 +103,6 @@ export default function CreateScreen() {
 	};
 
 	const uploadPhotoToServer = async () => {
-		// console.log("uploadPhotoToServer >> capturedPhoto:", capturedPhoto);
-
 		try {
 			const docRef = await addDoc(collection(dbFirestore, "dcim"), {
 				capturedPhoto,

@@ -11,10 +11,8 @@ import { useEffect, useState } from "react";
 
 export default function PostScreen() {
 	const navigation = useNavigation();
-	const [posts, setPosts] = useState([]); // array of photo-objects
-
 	const { params: itemParams } = useRoute(null);
-	console.log("PostScreen >> itemParams:", itemParams);
+	const [posts, setPosts] = useState([]); // array of photo-objects
 
 	useEffect(() => {
 		if (itemParams) {
