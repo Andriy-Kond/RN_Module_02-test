@@ -1,6 +1,6 @@
 import { dbDatabase, dbFirestore, storage } from "../../firebase/config";
 import { collection, addDoc } from "firebase/firestore";
-import { ref } from "firebase/storage";
+import { ref, uploadBytes } from "firebase/storage";
 
 // TODO: save photo on phone storage
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -104,11 +104,17 @@ export default function CreateScreen() {
 
 	const uploadPhotoToServer = async () => {
 		try {
-			const response = await fetch(capturedPhoto);
-			const file = await response.blob();
+			// // send to storage
 			const uniqPostId = Date.now().toString();
-			await storage().ref(`postImage/${uniqPostId}`).put(file);
+			// const response = await fetch(capturedPhoto);
+			// const file = await response.blob();
+			// await storage().ref(`postImage/${uniqPostId}`).put(file);
 
+			const pictureRef = await ref(storage, `capturedPhoto_${uniqPostId}.jpg`);
+			const blob = new Blob([capturedPhoto], { type: "image/jpeg" });
+			await uploadBytes(pictureRef, blob);
+
+			// send to db
 			const docRef = await addDoc(collection(dbFirestore, "dcim"), {
 				capturedPhoto,
 			});
