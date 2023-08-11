@@ -13,13 +13,14 @@ export default function PostScreen() {
 	const navigation = useNavigation();
 	const [posts, setPosts] = useState([]); // array of photo-objects
 
-	const { params: capturedPhoto } = useRoute();
+	const { params: itemParams } = useRoute(null);
+	console.log("PostScreen >> itemParams:", itemParams);
 
 	useEffect(() => {
-		if (capturedPhoto) {
-			setPosts((prevState) => [...prevState, capturedPhoto]);
+		if (itemParams) {
+			setPosts((prevState) => [...prevState, itemParams]);
 		}
-	}, [capturedPhoto]);
+	}, [itemParams]);
 
 	return (
 		<View style={styles.container}>
@@ -29,13 +30,17 @@ export default function PostScreen() {
 				keyExtractor={(item, indx) => indx.toString()}
 				renderItem={({ item }) => {
 					const indx = posts.indexOf(item);
+
 					return (
 						<View style={styles.imgContainer}>
 							<Text Style={styles.imgTitle}>Image number: {indx + 1}</Text>
-							<Image source={{ uri: item.uri }} style={styles.currentImg} />
+							<Image
+								source={{ uri: item.capturedPhoto }}
+								style={styles.currentImg}
+							/>
 							<View style={styles.buttonsWrapper}>
 								<TouchableOpacity
-									onPress={() => navigation.navigate("MapScreen")}>
+									onPress={() => navigation.navigate("MapScreen", item)}>
 									<Text>Go to MAP</Text>
 								</TouchableOpacity>
 

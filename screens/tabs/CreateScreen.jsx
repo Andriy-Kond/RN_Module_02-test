@@ -23,8 +23,9 @@ export default function CreateScreen() {
 	// const [permissionCamera, requestPermissionCamera] = Camera.useCameraPermissions(); //? why don't work
 
 	const [prevCapturedPhoto, setPrevCapturedPhoto] = useState(null);
-	const [capturedPhoto, setCapturedPhoto] = useState(null); // photo object
+	const [capturedPhoto, setCapturedPhoto] = useState(null); // photo link
 	const [capturedLocation, setCapturedLocation] = useState(null);
+	console.log("CreateScreen >> capturedLocation:", capturedLocation);
 
 	const [showMessage, setShowMessage] = useState(false);
 	const [modalMessage, setModalMessage] = useState("");
@@ -72,22 +73,29 @@ export default function CreateScreen() {
 
 			setPrevCapturedPhoto(capturedPhoto);
 			const photo = await cameraRef.current.takePictureAsync();
-			setCapturedPhoto(photo);
+			console.log("takePhoto >> photo:", photo);
+			setCapturedPhoto(photo.uri);
 
-			await MediaLibrary.createAssetAsync(photo.uri);
+			const media = await MediaLibrary.createAssetAsync(photo.uri);
+			console.log("takePhoto >> media:", media);
 
 			const location = await Location.getCurrentPositionAsync();
-			// console.log("takePhoto >> location:", location);
+			console.log("takePhoto >> location:", location);
 			setCapturedLocation(location);
 		}
 	};
 
-	const sendPhoto = () => {
+	const sendPhoto = async () => {
 		if (capturedPhoto) {
-			if (capturedPhoto.uri !== prevCapturedPhoto?.uri) {
+			if (capturedPhoto !== prevCapturedPhoto) {
+				console.log("sendPhoto >> capturedPhoto:", capturedPhoto);
+				console.log("sendPhoto >> capturedLocation:", capturedLocation);
 				setPrevCapturedPhoto(capturedPhoto);
-				navigation.navigate("DefaultScreenPosts", capturedPhoto);
-				uploadPhotoToServer();
+				navigation.navigate("DefaultScreenPosts", {
+					capturedPhoto,
+					capturedLocation,
+				});
+				await uploadPhotoToServer();
 			} else {
 				showMessagePopup(
 					"Hey dude, it's the same photo. Make a new one, even better, dude..."
@@ -101,74 +109,18 @@ export default function CreateScreen() {
 	};
 
 	const uploadPhotoToServer = async () => {
-		// await writeDataToFirestore(capturedPhoto);
-		// writeDataToRealtimeDatabase(capturedPhoto);
-		console.log("uploadPhotoToServer >> capturedPhoto:", capturedPhoto);
-
-		//^ for Cloud Firestore
-		// const response = await fetch(capturedPhoto);
-		// const file = capturedPhoto.blob();
+		// console.log("uploadPhotoToServer >> capturedPhoto:", capturedPhoto);
 
 		try {
-			const docRef = await addDoc(
-				collection(dbFirestore, "DCIM"),
-				capturedPhoto
-			);
+			const docRef = await addDoc(collection(dbFirestore, "dcim"), {
+				capturedPhoto,
+			});
 			console.log("Document written with ID: ", docRef.id);
 		} catch (e) {
 			console.error("Error adding data: ", e);
 			throw e;
 		}
-
-		//^ for Realtime Database:
-		// const response = await fetch(capturedPhoto);
-		// const file = response.blob();
-		// try {
-		// 	const uniqPostId = Date.now().toString();
-		// 	const data = set(ref(dbDatabase, "DCIM/" + uniqPostId), file);
-		// 	console.log("data >> data:", data);
-		// } catch (e) {
-		// 	console.error("Error adding data: ", e);
-		// 	throw e;
-		// }
 	};
-
-	// // for Cloud Firestore
-	// const writeDataToFirestore = async (capturedPhoto) => {
-	// 	// console.log("writeDataToFirestore >> capturedPhoto:", capturedPhoto);
-	// 	try {
-	// 		// addDoc - додає дані в колекцію
-	// 		// collection - створює колекцію у базі даних db
-	// 		const docRef = await addDoc(collection(dbDatabase, "DCIM"), {
-	// 			capturedPhoto,
-	// 		});
-	// 		// docRef.id - id документа, створеного в колекції
-	// 		console.log("Document written with ID: ", docRef.id);
-	// 	} catch (e) {
-	// 		console.error("Error adding document: ", e);
-	// 		throw e;
-	// 	}
-	// };
-
-	// // for Realtime Database:
-	// const writeDataToRealtimeDatabase = async (capturedPhoto) => {
-	// 	console.log("writeDataToRealtimeDatabase >> capturedPhoto:", capturedPhoto);
-	// 	try {
-	// 		// const response = await fetch(capturedPhoto);
-	// 		// console.log("uploadPhotoToServer >> response:", response);
-	// 		// const file = capturedPhoto.blob();
-	// 		// console.log("uploadPhotoToServer >> file:", file);
-	// 		const uniqPostId = Date.now().toString();
-	// 		console.log("uploadPhotoToServer >> uniqPostId:", uniqPostId);
-	// 		const data = set(ref(dbDatabase, "DCIM/" + uniqPostId), {
-	// 			capturedPhoto,
-	// 		});
-	// 		console.log("data >> data:", data);
-	// 	} catch (e) {
-	// 		console.error("Error adding data: ", e);
-	// 		throw e;
-	// 	}
-	// };
 
 	if (permissionCamera === null) {
 		return <Text>Очікую доступу до камери...</Text>;
@@ -188,7 +140,7 @@ export default function CreateScreen() {
 				{capturedPhoto && (
 					<View style={styles.photoImgContainer}>
 						<Image
-							source={{ uri: capturedPhoto.uri }}
+							source={{ uri: capturedPhoto }}
 							style={styles.photoImg}></Image>
 					</View>
 				)}
