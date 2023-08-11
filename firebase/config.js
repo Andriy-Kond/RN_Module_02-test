@@ -5,11 +5,13 @@ import { getAuth } from "firebase/auth";
 // Функція для підключення сховища файлів в проект
 import { getStorage } from "firebase/storage";
 
+import "firebase/storage";
+import "firebase/firestore";
 // import { getAnalytics } from "firebase/analytics";
 
 // Функції для підключення бази даних у проект
 import { getFirestore } from "firebase/firestore";
-import { getDatabase } from "firebase/database";
+// import { getDatabase } from "firebase/database";
 
 // web app's Firebase configuration
 const firebaseConfig = {
@@ -27,6 +29,6 @@ const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
 export const dbFirestore = getFirestore(app);
-export const dbDatabase = getDatabase(app);
 export const storage = getStorage(app);
+// export const dbDatabase = getDatabase(app);
 // export const analytics = getAnalytics(app);
