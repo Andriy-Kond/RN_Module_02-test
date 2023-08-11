@@ -1,6 +1,7 @@
-import { dbDatabase, dbFirestore } from "../../firebase/config";
-import { collection, addDoc } from "firebase/firestore";
-import { ref, set } from "firebase/database";
+import { dbDatabase, dbFirestore, storage } from "../../firebase/config";
+import { ref, uploadString } from "firebase/storage";
+import { collection, addDoc, uploadBytes } from "firebase/firestore";
+// import { ref, set } from "firebase/database";
 
 // TODO: save photo on phone storage
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -28,6 +29,8 @@ export default function CreateScreen() {
 
 	const [showMessage, setShowMessage] = useState(false);
 	const [modalMessage, setModalMessage] = useState("");
+
+	// const [file, setFile] = useState(null);
 
 	const showMessagePopup = (message) => {
 		setModalMessage(message);
@@ -74,7 +77,9 @@ export default function CreateScreen() {
 			const photo = await cameraRef.current.takePictureAsync();
 			setCapturedPhoto(photo);
 
-			await MediaLibrary.createAssetAsync(photo.uri);
+			const newFile = await MediaLibrary.createAssetAsync(photo.uri);
+			console.log("takePhoto >> newFile:", newFile);
+			// setFile(newFile);
 
 			const location = await Location.getCurrentPositionAsync();
 			// console.log("takePhoto >> location:", location);
@@ -103,18 +108,34 @@ export default function CreateScreen() {
 	const uploadPhotoToServer = async () => {
 		// await writeDataToFirestore(capturedPhoto);
 		// writeDataToRealtimeDatabase(capturedPhoto);
-		console.log("uploadPhotoToServer >> capturedPhoto:", capturedPhoto);
+		// console.log("uploadPhotoToServer >> capturedPhoto:", capturedPhoto);
 
 		//^ for Cloud Firestore
 		// const response = await fetch(capturedPhoto);
-		// const file = capturedPhoto.blob();
+		// const file = capturedPhoto.uri.blob();
+		// console.log("uploadPhotoToServer >> file:", file);
 
+		console.log("uploadPhotoToServer >> capturedPhoto:", capturedPhoto);
 		try {
 			const docRef = await addDoc(
 				collection(dbFirestore, "DCIM"),
 				capturedPhoto
 			);
-			console.log("Document written with ID: ", docRef.id);
+
+			const response = await fetch(capturedPhoto.uri);
+
+			// const uniqPostId = Date.now().toString();
+
+			// const storageRef = ref(storage, "DCIM");
+			// console.log("uploadPhotoToServer >> storageRef:", storageRef);
+			// const blob = new Blob(capturedPhoto, { type: "application/jpg" });
+			// await uploadBytes(storageRef, file);
+			// const base64Load = await uploadString(
+			// 	storageRef,
+			// 	capturedPhoto.base64,
+			// 	"base64url"
+			// );
+			// console.log("uploadPhotoToServer >> base64Load");
 		} catch (e) {
 			console.error("Error adding data: ", e);
 			throw e;

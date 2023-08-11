@@ -1,31 +1,21 @@
-import { dbDatabase, dbFirestore } from "../../firebase/config";
-import { collection, addDoc } from "firebase/firestore";
-import { ref, set } from "firebase/database";
-
-// TODO: save photo on phone storage
+import { dbFirestore, storage } from "../../firebase/config";
+import { collection, addDoc, uploadBytes } from "firebase/firestore";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Camera, CameraType } from "expo-camera";
 import { useEffect, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-
 import * as Location from "expo-location";
 import * as MediaLibrary from "expo-media-library";
-
 import Modal from "react-native-modal";
-// import { writeDataToFirestore } from "../../utils/writeDataToFirestore";
 
 export default function CreateScreen() {
 	const cameraRef = useRef(null); // reference on camera in DOM
-
 	const [permissionLocation, setPermissionLocation] = useState(null);
 	const [permissionMediaLibrary, setPermissionMediaLibrary] = useState(null);
 	const [permissionCamera, setPermissionCamera] = useState(null);
-	// const [permissionCamera, requestPermissionCamera] = Camera.useCameraPermissions(); //? why don't work
-
 	const [prevCapturedPhoto, setPrevCapturedPhoto] = useState(null);
 	const [capturedPhoto, setCapturedPhoto] = useState(null); // photo object
 	const [capturedLocation, setCapturedLocation] = useState(null);
-
 	const [showMessage, setShowMessage] = useState(false);
 	const [modalMessage, setModalMessage] = useState("");
 
@@ -64,20 +54,14 @@ export default function CreateScreen() {
 
 	const takePhoto = async () => {
 		if (cameraRef.current) {
-			// const options = {
-			// 	quality: 1,
-			// 	base64: true,
-			// 	// exif: false,
-			// };
-
 			setPrevCapturedPhoto(capturedPhoto);
 			const photo = await cameraRef.current.takePictureAsync();
 			setCapturedPhoto(photo);
 
-			await MediaLibrary.createAssetAsync(photo.uri);
+			const newFile = await MediaLibrary.createAssetAsync(photo.uri);
+			console.log("takePhoto >> newFile:", newFile);
 
 			const location = await Location.getCurrentPositionAsync();
-			// console.log("takePhoto >> location:", location);
 			setCapturedLocation(location);
 		}
 	};
@@ -101,74 +85,18 @@ export default function CreateScreen() {
 	};
 
 	const uploadPhotoToServer = async () => {
-		// await writeDataToFirestore(capturedPhoto);
-		// writeDataToRealtimeDatabase(capturedPhoto);
-		console.log("uploadPhotoToServer >> capturedPhoto:", capturedPhoto);
-
-		//^ for Cloud Firestore
-		// const response = await fetch(capturedPhoto);
-		// const file = capturedPhoto.blob();
-
 		try {
 			const docRef = await addDoc(
 				collection(dbFirestore, "DCIM"),
 				capturedPhoto
 			);
-			console.log("Document written with ID: ", docRef.id);
+
+			// Що треба додати сюди?
 		} catch (e) {
 			console.error("Error adding data: ", e);
 			throw e;
 		}
-
-		//^ for Realtime Database:
-		// const response = await fetch(capturedPhoto);
-		// const file = response.blob();
-		// try {
-		// 	const uniqPostId = Date.now().toString();
-		// 	const data = set(ref(dbDatabase, "DCIM/" + uniqPostId), file);
-		// 	console.log("data >> data:", data);
-		// } catch (e) {
-		// 	console.error("Error adding data: ", e);
-		// 	throw e;
-		// }
 	};
-
-	// // for Cloud Firestore
-	// const writeDataToFirestore = async (capturedPhoto) => {
-	// 	// console.log("writeDataToFirestore >> capturedPhoto:", capturedPhoto);
-	// 	try {
-	// 		// addDoc - додає дані в колекцію
-	// 		// collection - створює колекцію у базі даних db
-	// 		const docRef = await addDoc(collection(dbDatabase, "DCIM"), {
-	// 			capturedPhoto,
-	// 		});
-	// 		// docRef.id - id документа, створеного в колекції
-	// 		console.log("Document written with ID: ", docRef.id);
-	// 	} catch (e) {
-	// 		console.error("Error adding document: ", e);
-	// 		throw e;
-	// 	}
-	// };
-
-	// // for Realtime Database:
-	// const writeDataToRealtimeDatabase = async (capturedPhoto) => {
-	// 	console.log("writeDataToRealtimeDatabase >> capturedPhoto:", capturedPhoto);
-	// 	try {
-	// 		// const response = await fetch(capturedPhoto);
-	// 		// console.log("uploadPhotoToServer >> response:", response);
-	// 		// const file = capturedPhoto.blob();
-	// 		// console.log("uploadPhotoToServer >> file:", file);
-	// 		const uniqPostId = Date.now().toString();
-	// 		console.log("uploadPhotoToServer >> uniqPostId:", uniqPostId);
-	// 		const data = set(ref(dbDatabase, "DCIM/" + uniqPostId), {
-	// 			capturedPhoto,
-	// 		});
-	// 		console.log("data >> data:", data);
-	// 	} catch (e) {
-	// 		console.error("Error adding data: ", e);
-	// 		throw e;
-	// 	}
-	// };
 
 	if (permissionCamera === null) {
 		return <Text>Очікую доступу до камери...</Text>;
