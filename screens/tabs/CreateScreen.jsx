@@ -106,8 +106,9 @@ export default function CreateScreen() {
 
 	const uploadPhotoToServer = async () => {
 		try {
-			// to Blob from uri
+			// to BLOB from uri
 			const blobFile = await uriToBlob(capturedPhoto);
+
 			// send to storage
 			const uniqPostId = Date.now().toString();
 			const storageRef = ref(storage, `images/${uniqPostId}`);
