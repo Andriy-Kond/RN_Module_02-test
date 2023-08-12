@@ -1,4 +1,4 @@
-import { dbFirestore, storage } from "../../firebase/config";
+import { dbDatabase, dbFirestore, storage } from "../../firebase/config";
 import { collection, addDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
@@ -12,7 +12,8 @@ import * as Location from "expo-location";
 import * as MediaLibrary from "expo-media-library";
 
 import Modal from "react-native-modal";
-import { uriToBlob } from "../../utils/uriToBlob";
+import { uriToBlob } from "./fn";
+// import { writeDataToFirestore } from "../../utils/writeDataToFirestore";
 
 export default function CreateScreen() {
 	const cameraRef = useRef(null); // reference on camera in DOM
@@ -72,7 +73,7 @@ export default function CreateScreen() {
 			// };
 
 			setPrevCapturedPhoto(capturedPhoto);
-			const photo = await cameraRef.current.takePictureAsync();
+			const photo = await cameraRef.current.takePictureAsync(options);
 			setCapturedPhoto(photo.uri);
 			// setCapturedPhotoBase64(photo.base64);
 
@@ -105,17 +106,42 @@ export default function CreateScreen() {
 	};
 
 	const uploadPhotoToServer = async () => {
+		// send to storage
+		const uniqPostId = Date.now().toString();
+		const storageRef = ref(storage, `images/${uniqPostId}`);
+		const blobFile = await uriToBlob(capturedPhoto);
+
 		try {
-			// to Blob from uri
-			const blobFile = await uriToBlob(capturedPhoto);
-			// send to storage
-			const uniqPostId = Date.now().toString();
-			const storageRef = ref(storage, `images/${uniqPostId}`);
 			uploadBytes(storageRef, blobFile).then(async (snapshot) => {
 				console.log("snapshot", snapshot);
 				const url = await getDownloadURL(storageRef);
 				return url;
 			});
+
+			// const blobFile = await response.blob();
+
+			// const reference = ref(storage, `images/${uniqPostId}`);
+			// const result = await uploadBytesResumable(reference, blobFile);
+			// const url = await getDownloadURL(result.ref);
+			// console.log("url", url);
+			// await createPost(url);
+
+			//~ option #1 (video)
+			// const response = await fetch(capturedPhoto);
+			// const file = await response.blob();
+			// await storage().ref(`postImage/${uniqPostId}`).put(file);
+
+			//~ option #2 (mine)
+			// const uniqPostId = Date.now().toString();
+			// const pictureRef = await ref(storage, `capturedPhoto_${uniqPostId}.jpg`);
+			// console.log(
+			// 	"uploadPhotoToServer >> capturedPhotoBase64:",
+			// 	capturedPhotoBase64
+			// );
+
+			// const byteCharacters = base64.decode(`${capturedPhotoBase64}`);
+			// const blob = new Blob([byteCharacters], { type: "image/jpeg" });
+			// await uploadBytes(pictureRef, blob);
 
 			// send to db
 			const docRef = await addDoc(collection(dbFirestore, "dcim"), {
@@ -200,8 +226,8 @@ const styles = StyleSheet.create({
 	},
 
 	photoImg: {
-		height: 450,
-		width: 300,
+		height: 200,
+		width: 200,
 	},
 
 	buttonContainer: {
