@@ -51,6 +51,14 @@ function TabsNavigation() {
 						<FontAwesome5 name="plus" size={35} color={color} />
 					),
 				}}
+				// listeners={({ navigation }) => ({
+				// 	tabPress: (event) => {
+				// 		if (resetState) {
+				// 			resetState(); // Викликаємо функцію обнулення стану перед переходом
+				// 		}
+				// 		navigation.navigate("Create");
+				// 	},
+				// })}
 			/>
 			<MainStack.Screen
 				name="Profile"

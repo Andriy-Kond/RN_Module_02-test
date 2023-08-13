@@ -43,7 +43,6 @@ export default function CreateScreen() {
 	const [imageComment, setImageComment] = useState("");
 
 	const [isBtnSendEnabled, setIsBtnSendEnabled] = useState(false);
-	const [isBtnEnabled, setIsBtnEnabled] = useState(true);
 
 	const { userId, nickname } = useSelector((state) => state.auth);
 	const isShowModalMessagePopup = (message) => {
@@ -53,6 +52,13 @@ export default function CreateScreen() {
 	const hideMessagePopup = () => {
 		setIsShowModalMessage(false);
 	};
+
+	const resetState = () => {
+		setCapturedPhoto(null);
+		setPrevCapturedPhoto(null);
+		setIsBtnSendEnabled(false);
+	};
+	resetState();
 
 	// request accesses to camera, location and mediaLibrary
 	useEffect(() => {
@@ -143,12 +149,6 @@ export default function CreateScreen() {
 		}
 	};
 
-	// if (permissionLocation === null) {
-	// 	return <Text>Очікую доступу до геолокації...</Text>;
-	// } else if (!permissionLocation) {
-	// 	return <Text>Немає доступу до геолокації</Text>;
-	// }
-
 	return (
 		<View style={styles.container}>
 			{permissionCamera === null ? (
@@ -178,17 +178,11 @@ export default function CreateScreen() {
 			</View>
 
 			<View style={styles.buttonContainer}>
-				<TouchableOpacity
-					style={styles.button}
-					onPress={toggleCameraType}
-					disabled={!isBtnEnabled}>
+				<TouchableOpacity style={styles.button} onPress={toggleCameraType}>
 					<Text style={styles.text}>Flip Camera</Text>
 				</TouchableOpacity>
 
-				<TouchableOpacity
-					style={styles.button}
-					onPress={takePhoto}
-					disabled={!isBtnEnabled}>
+				<TouchableOpacity style={styles.button} onPress={takePhoto}>
 					<Text style={styles.text}>SNAP</Text>
 				</TouchableOpacity>
 
@@ -224,36 +218,21 @@ const styles = StyleSheet.create({
 
 	camera: {
 		flex: 1,
-		// alignItems: "center",
-		// justifyContent: "center",
 	},
 
 	photoImgContainer: {
-		// position: "absolute",
-		// top: 50,
-		// left: 10,
 		flex: 1,
-		// alignItems: "center",
-		// justifyContent: "flex-end",
 		borderColor: "#fff",
 		borderWidth: 3,
-		// height: "100%",
-		// width: "100%",
 		borderWidth: 15,
 		borderColor: "#0021f9",
 	},
 
 	photoImg: {
-		// flex: 1,
 		alignSelf: "center",
-		// alignItems: "center",
-		// justifyContent: "flex-end",
-		// height: 450,
 		width: 350,
-		resizeMode: "contain",
-
 		height: "100%",
-		// width: "100%",
+		resizeMode: "contain",
 		borderWidth: 15,
 		borderColor: "#f90000",
 	},
