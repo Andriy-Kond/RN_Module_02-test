@@ -51,7 +51,7 @@ export default function PostScreen() {
 			<Text>It is PostScreen</Text>
 			<FlatList
 				data={posts}
-				keyExtractor={(item, indx) => indx.toString()}
+				keyExtractor={(item, indx) => item.id}
 				renderItem={({ item }) => {
 					const indx = posts.indexOf(item);
 
@@ -59,17 +59,24 @@ export default function PostScreen() {
 						<View style={styles.imgContainer}>
 							<Text Style={styles.imgTitle}>Image number: {indx + 1}</Text>
 							<Image
-								source={{ uri: item.capturedPhoto }}
+								source={{ uri: item.data.photo }}
 								style={styles.currentImg}
 							/>
 							<View style={styles.buttonsWrapper}>
 								<TouchableOpacity
-									onPress={() => navigation.navigate("MapScreen", item)}>
+									onPress={() =>
+										navigation.navigate("MapScreen", item.data.location)
+									}>
 									<Text>Go to MAP</Text>
 								</TouchableOpacity>
 
 								<TouchableOpacity
-									onPress={() => navigation.navigate("CommentsScreen")}>
+									onPress={() =>
+										navigation.navigate(
+											"CommentsScreen",
+											item.data.imageComment
+										)
+									}>
 									<Text>Go to COMMENTS</Text>
 								</TouchableOpacity>
 							</View>

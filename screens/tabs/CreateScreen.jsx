@@ -43,7 +43,7 @@ export default function CreateScreen() {
 	const [imageComment, setImageComment] = useState("");
 
 	const [isBtnSendEnabled, setIsBtnSendEnabled] = useState(false);
-	console.log("CreateScreen >> isBtnSendEnabled:", isBtnSendEnabled);
+	const [isBtnEnabled, setIsBtnEnabled] = useState(true);
 
 	const { userId, nickname } = useSelector((state) => state.auth);
 	const isShowModalMessagePopup = (message) => {
@@ -99,13 +99,12 @@ export default function CreateScreen() {
 	const sendPhoto = async () => {
 		if (capturedPhoto) {
 			if (capturedPhoto !== prevCapturedPhoto) {
+				setIsBtnEnabled(false);
+				navigation.navigate("DefaultScreenPosts");
 				setImageComment("");
 				setPrevCapturedPhoto(capturedPhoto);
 
-				navigation.navigate("DefaultScreenPosts");
-				const photo = await uploadPhotoToServer();
-
-				await uploadPostToServer(photo);
+				await uploadPostToServer();
 			} else {
 				isShowModalMessagePopup(
 					"Hey dude, it's the same photo. Make a new one, even better, dude..."
@@ -114,8 +113,10 @@ export default function CreateScreen() {
 		}
 	};
 
-	const uploadPostToServer = async (photo) => {
+	const uploadPostToServer = async () => {
+		const photo = await uploadPhotoToServer();
 		// send to db
+		console.log("docRef >> capturedLocation.coords:", capturedLocation);
 
 		const docRef = await addDoc(collection(dbFirestore, "dcim"), {
 			photo,
@@ -124,7 +125,6 @@ export default function CreateScreen() {
 			userId,
 			nickname,
 		});
-		// console.log("Document written with ID: ", docRef.id);
 	};
 
 	const uploadPhotoToServer = async () => {
@@ -189,11 +189,17 @@ export default function CreateScreen() {
 			</View>
 
 			<View style={styles.buttonContainer}>
-				<TouchableOpacity style={styles.button} onPress={toggleCameraType}>
+				<TouchableOpacity
+					style={styles.button}
+					onPress={toggleCameraType}
+					disabled={!isBtnEnabled}>
 					<Text style={styles.text}>Flip Camera</Text>
 				</TouchableOpacity>
 
-				<TouchableOpacity style={styles.button} onPress={takePhoto}>
+				<TouchableOpacity
+					style={styles.button}
+					onPress={takePhoto}
+					disabled={!isBtnEnabled}>
 					<Text style={styles.text}>SNAP</Text>
 				</TouchableOpacity>
 
