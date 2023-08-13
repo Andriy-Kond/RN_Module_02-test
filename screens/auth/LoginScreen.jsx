@@ -62,9 +62,9 @@ export default function LoginScreen() {
 							<View>
 								<Text style={styles.inputTitle}>Email address</Text>
 								<TextInput
-									value={state.email}
 									style={styles.input}
 									onFocus={() => setIsShownKB(true)}
+									value={state.email}
 									onChangeText={(value) => {
 										setState((prevState) => {
 											return { ...prevState, email: value };
@@ -75,10 +75,10 @@ export default function LoginScreen() {
 							<View style={{ marginTop: 20 }}>
 								<Text style={styles.inputTitle}>Password</Text>
 								<TextInput
-									value={state.password}
 									style={styles.input}
 									secureTextEntry
 									onFocus={() => setIsShownKB(true)}
+									value={state.password}
 									onChangeText={(value) => {
 										setState((prevState) => {
 											return { ...prevState, password: value };

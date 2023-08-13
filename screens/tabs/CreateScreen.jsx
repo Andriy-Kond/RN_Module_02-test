@@ -3,7 +3,14 @@ import { collection, addDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 // TODO: save photo on phone storage
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+	Image,
+	StyleSheet,
+	Text,
+	TouchableOpacity,
+	View,
+	TextInput,
+} from "react-native";
 import { Camera, CameraType } from "expo-camera";
 import { useEffect, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -13,37 +20,42 @@ import * as MediaLibrary from "expo-media-library";
 
 import Modal from "react-native-modal";
 import { uriToBlob } from "../../utils/uriToBlob";
+import { useSelector } from "react-redux";
 
 export default function CreateScreen() {
+	const navigation = useNavigation();
+
 	const cameraRef = useRef(null); // reference on camera in DOM
+	const [type, setType] = useState(CameraType.back);
 
 	const [permissionLocation, setPermissionLocation] = useState(null);
 	const [permissionMediaLibrary, setPermissionMediaLibrary] = useState(null);
 	const [permissionCamera, setPermissionCamera] = useState(null);
-	// const [permissionCamera, requestPermissionCamera] = Camera.useCameraPermissions(); //? why don't work
 
 	const [prevCapturedPhoto, setPrevCapturedPhoto] = useState(null);
 	const [capturedPhoto, setCapturedPhoto] = useState(null); // photo link
-	// const [capturedPhotoBase64, setCapturedPhotoBase64] = useState(null); // photo link
 	const [capturedLocation, setCapturedLocation] = useState(null);
 
-	const [showMessage, setShowMessage] = useState(false);
+	// modal message
+	const [isShowModalMessage, setIsShowModalMessage] = useState(false);
 	const [modalMessage, setModalMessage] = useState("");
 
-	const showMessagePopup = (message) => {
+	const [imageComment, setImageComment] = useState("");
+
+	const { userId, nickname } = useSelector((state) => state.auth);
+	console.log("CreateScreen >> nickname:", nickname);
+	console.log("CreateScreen >> userId:", userId);
+
+	const isShowModalMessagePopup = (message) => {
 		setModalMessage(message);
-		setShowMessage(true);
+		setIsShowModalMessage(true);
 	};
 
 	const hideMessagePopup = () => {
-		setShowMessage(false);
+		setIsShowModalMessage(false);
 	};
 
-	const [type, setType] = useState(CameraType.back);
-
-	const navigation = useNavigation();
-
-	// request accesses camera, location, mediaLibrary
+	// request accesses to camera, location and mediaLibrary
 	useEffect(() => {
 		(async () => {
 			const camera = await Camera.requestCameraPermissionsAsync();
@@ -91,17 +103,30 @@ export default function CreateScreen() {
 					capturedPhoto,
 					capturedLocation,
 				});
-				await uploadPhotoToServer();
+				const photo = await uploadPhotoToServer();
+				await uploadPostToServer(photo);
 			} else {
-				showMessagePopup(
+				isShowModalMessagePopup(
 					"Hey dude, it's the same photo. Make a new one, even better, dude..."
 				);
 			}
 		} else {
-			showMessagePopup(
+			isShowModalMessagePopup(
 				"Hey dude, I don't have any photo yet... Tap on SNAP button to take one, dude"
 			);
 		}
+	};
+
+	const uploadPostToServer = async (photo) => {
+		// send to db
+		const docRef = await addDoc(collection(dbFirestore, "dcim"), {
+			photo,
+			imageComment,
+			location: capturedLocation.coords,
+			userId,
+			nickname,
+		});
+		// console.log("Document written with ID: ", docRef.id);
 	};
 
 	const uploadPhotoToServer = async () => {
@@ -113,18 +138,23 @@ export default function CreateScreen() {
 			const uniqPostId = Date.now().toString();
 			const storageRef = ref(storage, `images/${uniqPostId}`);
 			const data = await uploadBytes(storageRef, blobFile);
+
+			// take from server
 			const url = await getDownloadURL(storageRef);
 
-			// send to db
-			const docRef = await addDoc(collection(dbFirestore, "dcim"), {
-				capturedPhoto,
-			});
-			console.log("Document written with ID: ", docRef.id);
+			console.log("uploadPhotoToServer >> url:", url);
+			return url;
 		} catch (e) {
 			console.error("Error adding data: ", e);
 			throw e;
 		}
 	};
+
+	// const imageMessage = (value) => {
+	// 	() => {
+	// 		setImageComment(value);
+	// 	};
+	// };
 
 	if (permissionCamera === null) {
 		return <Text>Очікую доступу до камери...</Text>;
@@ -148,23 +178,33 @@ export default function CreateScreen() {
 							style={styles.photoImg}></Image>
 					</View>
 				)}
-
-				<View style={styles.buttonContainer}>
-					<TouchableOpacity style={styles.button} onPress={toggleCameraType}>
-						<Text style={styles.text}>Flip Camera</Text>
-					</TouchableOpacity>
-
-					<TouchableOpacity style={styles.button} onPress={takePhoto}>
-						<Text style={styles.text}>SNAP</Text>
-					</TouchableOpacity>
-
-					<TouchableOpacity style={styles.button} onPress={sendPhoto}>
-						<Text style={styles.text}>SEND PHOTO</Text>
-					</TouchableOpacity>
-				</View>
 			</Camera>
 
-			<Modal isVisible={showMessage} onBackdropPress={hideMessagePopup}>
+			<View style={styles.imageCommentContainer}>
+				<TextInput
+					style={styles.imageComment}
+					value={imageComment}
+					onChangeText={(value) => {
+						setImageComment(value);
+					}}
+				/>
+			</View>
+
+			<View style={styles.buttonContainer}>
+				<TouchableOpacity style={styles.button} onPress={toggleCameraType}>
+					<Text style={styles.text}>Flip Camera</Text>
+				</TouchableOpacity>
+
+				<TouchableOpacity style={styles.button} onPress={takePhoto}>
+					<Text style={styles.text}>SNAP</Text>
+				</TouchableOpacity>
+
+				<TouchableOpacity style={styles.button} onPress={sendPhoto}>
+					<Text style={styles.text}>SEND PHOTO</Text>
+				</TouchableOpacity>
+			</View>
+
+			<Modal isVisible={isShowModalMessage} onBackdropPress={hideMessagePopup}>
 				<View style={styles.modalContent}>
 					<Text style={styles.modalText}>{modalMessage}</Text>
 					<TouchableOpacity
@@ -185,23 +225,41 @@ const styles = StyleSheet.create({
 
 	camera: {
 		flex: 1,
-		alignItems: "center",
-		justifyContent: "flex-end",
+		// alignItems: "center",
+		// justifyContent: "center",
 	},
 
 	photoImgContainer: {
-		position: "absolute",
-		top: 50,
-		left: 10,
+		// position: "absolute",
+		// top: 50,
+		// left: 10,
+		flex: 1,
+		// alignItems: "center",
+		// justifyContent: "flex-end",
 		borderColor: "#fff",
 		borderWidth: 3,
+		// height: "100%",
+		// width: "100%",
+		borderWidth: 15,
+		borderColor: "#0021f9",
 	},
 
 	photoImg: {
-		height: 450,
-		width: 300,
+		// flex: 1,
+		alignSelf: "center",
+		// alignItems: "center",
+		// justifyContent: "flex-end",
+		// height: 450,
+		width: 350,
+		resizeMode: "contain",
+
+		height: "100%",
+		// width: "100%",
+		borderWidth: 15,
+		borderColor: "#f90000",
 	},
 
+	// buttons
 	buttonContainer: {
 		paddingHorizontal: 20,
 		width: "100%",
@@ -217,16 +275,16 @@ const styles = StyleSheet.create({
 		padding: 10,
 		borderWidth: 2,
 		borderRadius: 50,
-		borderColor: "rgba(255, 255, 255, 0.5)",
+		borderColor: "#0d0d0d7f",
 	},
 
 	text: {
-		color: "#fff",
+		color: "#000",
 	},
 
 	// Modal styles
 	modalContent: {
-		backgroundColor: "white",
+		backgroundColor: "#fff",
 		padding: 20,
 		borderRadius: 8,
 	},
@@ -242,7 +300,19 @@ const styles = StyleSheet.create({
 		backgroundColor: "#007BFF",
 	},
 	modalButtonText: {
-		color: "white",
+		color: "#fff",
 		fontWeight: "bold",
+	},
+
+	// Image Comment
+	imageCommentContainer: {
+		marginHorizontal: 10,
+		borderWidth: 2,
+		borderRadius: 50,
+		borderColor: "#007BFF",
+		marginVertical: 10,
+	},
+	imageComment: {
+		color: "#000",
 	},
 });

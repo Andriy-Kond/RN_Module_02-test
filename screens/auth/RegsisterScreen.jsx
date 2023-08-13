@@ -67,10 +67,10 @@ export default function RegisterScreen() {
 							<View>
 								<Text style={styles.inputTitle}>Login</Text>
 								<TextInput
-									value={state.nickname}
 									style={styles.input}
 									onSubmitEditing={hideKB}
 									onFocus={() => setIsShownKB(true)}
+									value={state.nickname}
 									onChangeText={(value) => {
 										setState((prevState) => {
 											return { ...prevState, nickname: value };
@@ -82,10 +82,10 @@ export default function RegisterScreen() {
 							<View style={{ marginTop: 20 }}>
 								<Text style={styles.inputTitle}>Email address</Text>
 								<TextInput
-									value={state.email}
 									style={styles.input}
 									onSubmitEditing={hideKB}
 									onFocus={() => setIsShownKB(true)}
+									value={state.email}
 									onChangeText={(value) => {
 										setState((prevState) => {
 											return { ...prevState, email: value };
@@ -97,11 +97,11 @@ export default function RegisterScreen() {
 							<View style={{ marginTop: 20 }}>
 								<Text style={styles.inputTitle}>Password</Text>
 								<TextInput
-									value={state.password}
 									style={styles.input}
 									secureTextEntry
 									onSubmitEditing={hideKB}
 									onFocus={() => setIsShownKB(true)}
+									value={state.password}
 									onChangeText={(value) => {
 										setState((prevState) => {
 											return { ...prevState, password: value };
