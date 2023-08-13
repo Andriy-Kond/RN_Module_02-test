@@ -76,13 +76,8 @@ export default function CreateScreen() {
 
 	const takePhoto = async () => {
 		if (cameraRef.current) {
-			// const options = {
-			// 	quality: 1,
-			// 	base64: true,
-			// 	// exif: false,
-			// };
-
 			const photo = await cameraRef.current.takePictureAsync();
+
 			if (photo?.uri) {
 				setIsBtnSendEnabled(true);
 				setPrevCapturedPhoto(capturedPhoto);
@@ -90,8 +85,10 @@ export default function CreateScreen() {
 
 				await MediaLibrary.createAssetAsync(photo.uri);
 
-				const location = await Location.getCurrentPositionAsync();
-				setCapturedLocation(location);
+				if (permissionLocation) {
+					const newLocation = await Location.getCurrentPositionAsync();
+					setCapturedLocation(newLocation);
+				}
 			}
 		}
 	};
@@ -99,16 +96,14 @@ export default function CreateScreen() {
 	const sendPhoto = async () => {
 		if (capturedPhoto) {
 			if (capturedPhoto !== prevCapturedPhoto) {
-				setIsBtnEnabled(false);
 				navigation.navigate("DefaultScreenPosts");
+
 				setImageComment("");
 				setPrevCapturedPhoto(capturedPhoto);
 
 				await uploadPostToServer();
 			} else {
-				isShowModalMessagePopup(
-					"Hey dude, it's the same photo. Make a new one, even better, dude..."
-				);
+				isShowModalMessagePopup("You already have this photo. Make new one");
 			}
 		}
 	};
@@ -116,15 +111,17 @@ export default function CreateScreen() {
 	const uploadPostToServer = async () => {
 		const photo = await uploadPhotoToServer();
 		// send to db
-		console.log("docRef >> capturedLocation.coords:", capturedLocation);
+		console.log("uploadPostToServer >> capturedLocation:", capturedLocation);
 
-		const docRef = await addDoc(collection(dbFirestore, "dcim"), {
-			photo,
-			imageComment,
-			location: capturedLocation.coords,
-			userId,
-			nickname,
-		});
+		if (capturedLocation) {
+			await addDoc(collection(dbFirestore, "dcim"), {
+				photo,
+				imageComment,
+				location: capturedLocation.coords,
+				userId,
+				nickname,
+			});
+		}
 	};
 
 	const uploadPhotoToServer = async () => {
@@ -135,12 +132,10 @@ export default function CreateScreen() {
 			// send to storage
 			const uniqPostId = Date.now().toString();
 			const storageRef = ref(storage, `images/${uniqPostId}`);
-			const data = await uploadBytes(storageRef, blobFile);
+			await uploadBytes(storageRef, blobFile);
 
 			// take from server
 			const url = await getDownloadURL(storageRef);
-
-			console.log("uploadPhotoToServer >> url:", url);
 			return url;
 		} catch (e) {
 			console.error("Error adding data: ", e);
@@ -148,35 +143,29 @@ export default function CreateScreen() {
 		}
 	};
 
-	// const imageMessage = (value) => {
-	// 	() => {
-	// 		setImageComment(value);
-	// 	};
-	// };
-
-	if (permissionCamera === null) {
-		return <Text>Очікую доступу до камери...</Text>;
-	} else if (!permissionCamera) {
-		return <Text>Немає доступу до камери</Text>;
-	}
-
-	if (permissionLocation === null) {
-		return <Text>Очікую доступу до геолокації...</Text>;
-	} else if (!permissionLocation) {
-		return <Text>Немає доступу до геолокації</Text>;
-	}
+	// if (permissionLocation === null) {
+	// 	return <Text>Очікую доступу до геолокації...</Text>;
+	// } else if (!permissionLocation) {
+	// 	return <Text>Немає доступу до геолокації</Text>;
+	// }
 
 	return (
 		<View style={styles.container}>
-			<Camera ref={cameraRef} style={styles.camera} type={type}>
-				{capturedPhoto && (
-					<View style={styles.photoImgContainer}>
-						<Image
-							source={{ uri: capturedPhoto }}
-							style={styles.photoImg}></Image>
-					</View>
-				)}
-			</Camera>
+			{permissionCamera === null ? (
+				<Text>Очікую доступу до камери...</Text>
+			) : !permissionCamera ? (
+				<Text>Немає доступу до камери</Text>
+			) : (
+				<Camera ref={cameraRef} style={styles.camera} type={type}>
+					{capturedPhoto && (
+						<View style={styles.photoImgContainer}>
+							<Image
+								source={{ uri: capturedPhoto }}
+								style={styles.photoImg}></Image>
+						</View>
+					)}
+				</Camera>
+			)}
 
 			<View style={styles.imageCommentContainer}>
 				<TextInput
@@ -230,6 +219,7 @@ export default function CreateScreen() {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
+		justifyContent: "flex-end",
 	},
 
 	camera: {
