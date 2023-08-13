@@ -114,6 +114,13 @@ export default function CreateScreen() {
 			const storageRef = ref(storage, `images/${uniqPostId}`);
 			const data = await uploadBytes(storageRef, blobFile);
 			const url = await getDownloadURL(storageRef);
+			// return url;
+
+			// uploadBytes(storageRef, blobFile).then(async (snapshot) => {
+			// 	console.log("snapshot", snapshot);
+			// 	const url = await getDownloadURL(storageRef);
+			// 	return url;
+			// });
 
 			// send to db
 			const docRef = await addDoc(collection(dbFirestore, "dcim"), {
