@@ -42,15 +42,14 @@ export default function CreateScreen() {
 
 	const [imageComment, setImageComment] = useState("");
 
-	const { userId, nickname } = useSelector((state) => state.auth);
-	console.log("CreateScreen >> nickname:", nickname);
-	console.log("CreateScreen >> userId:", userId);
+	const [isBtnSendEnabled, setIsBtnSendEnabled] = useState(false);
+	console.log("CreateScreen >> isBtnSendEnabled:", isBtnSendEnabled);
 
+	const { userId, nickname } = useSelector((state) => state.auth);
 	const isShowModalMessagePopup = (message) => {
 		setModalMessage(message);
 		setIsShowModalMessage(true);
 	};
-
 	const hideMessagePopup = () => {
 		setIsShowModalMessage(false);
 	};
@@ -83,42 +82,41 @@ export default function CreateScreen() {
 			// 	// exif: false,
 			// };
 
-			setPrevCapturedPhoto(capturedPhoto);
 			const photo = await cameraRef.current.takePictureAsync();
-			setCapturedPhoto(photo.uri);
-			// setCapturedPhotoBase64(photo.base64);
+			if (photo?.uri) {
+				setIsBtnSendEnabled(true);
+				setPrevCapturedPhoto(capturedPhoto);
+				setCapturedPhoto(photo.uri);
 
-			await MediaLibrary.createAssetAsync(photo.uri);
+				await MediaLibrary.createAssetAsync(photo.uri);
 
-			const location = await Location.getCurrentPositionAsync();
-			setCapturedLocation(location);
+				const location = await Location.getCurrentPositionAsync();
+				setCapturedLocation(location);
+			}
 		}
 	};
 
 	const sendPhoto = async () => {
 		if (capturedPhoto) {
 			if (capturedPhoto !== prevCapturedPhoto) {
+				setImageComment("");
 				setPrevCapturedPhoto(capturedPhoto);
-				navigation.navigate("DefaultScreenPosts", {
-					capturedPhoto,
-					capturedLocation,
-				});
+
+				navigation.navigate("DefaultScreenPosts");
 				const photo = await uploadPhotoToServer();
+
 				await uploadPostToServer(photo);
 			} else {
 				isShowModalMessagePopup(
 					"Hey dude, it's the same photo. Make a new one, even better, dude..."
 				);
 			}
-		} else {
-			isShowModalMessagePopup(
-				"Hey dude, I don't have any photo yet... Tap on SNAP button to take one, dude"
-			);
 		}
 	};
 
 	const uploadPostToServer = async (photo) => {
 		// send to db
+
 		const docRef = await addDoc(collection(dbFirestore, "dcim"), {
 			photo,
 			imageComment,
@@ -199,8 +197,13 @@ export default function CreateScreen() {
 					<Text style={styles.text}>SNAP</Text>
 				</TouchableOpacity>
 
-				<TouchableOpacity style={styles.button} onPress={sendPhoto}>
-					<Text style={styles.text}>SEND PHOTO</Text>
+				<TouchableOpacity
+					style={[styles.button, !isBtnSendEnabled && styles.buttonDisabled]}
+					onPress={sendPhoto}
+					disabled={!isBtnSendEnabled}>
+					<Text style={[styles.text, !isBtnSendEnabled && styles.textDisabled]}>
+						SEND PHOTO
+					</Text>
 				</TouchableOpacity>
 			</View>
 
@@ -278,8 +281,16 @@ const styles = StyleSheet.create({
 		borderColor: "#0d0d0d7f",
 	},
 
+	buttonDisabled: {
+		borderColor: "#a9a8a87d",
+	},
+
 	text: {
 		color: "#000",
+	},
+
+	textDisabled: {
+		color: "#a9a8a87d",
 	},
 
 	// Modal styles

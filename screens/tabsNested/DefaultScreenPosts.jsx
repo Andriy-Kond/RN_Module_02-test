@@ -8,17 +8,43 @@ import {
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useEffect, useState } from "react";
+import { collection, getDocs, query, onSnapshot } from "firebase/firestore";
+import { dbFirestore } from "../../firebase/config";
 
 export default function PostScreen() {
+	// useEffect(() => {
+	// 	if (itemParams) {
+	// 		setPosts((prevState) => [...prevState, itemParams]);
+	// 	}
+	// }, [itemParams]);
+
 	const navigation = useNavigation();
 	const { params: itemParams } = useRoute(null);
-	const [posts, setPosts] = useState([]); // array of photo-objects
+
+	const [posts, setPosts] = useState([]); // array of objects
+	console.log("PostScreen >> posts:", posts);
 
 	useEffect(() => {
-		if (itemParams) {
-			setPosts((prevState) => [...prevState, itemParams]);
-		}
-	}, [itemParams]);
+		const unsubscribe = getAllPosts();
+		return () => {
+			unsubscribe();
+		};
+	}, []);
+
+	const getAllPosts = async () => {
+		const postsQuery = query(collection(dbFirestore, "dcim"));
+
+		const unsubscribe = onSnapshot(postsQuery, (snapshot) => {
+			const arr = snapshot.docs.map((doc) => {
+				return {
+					id: doc.id,
+					data: doc.data(),
+				};
+			});
+			setPosts(arr);
+		});
+		return unsubscribe;
+	};
 
 	return (
 		<View style={styles.container}>
