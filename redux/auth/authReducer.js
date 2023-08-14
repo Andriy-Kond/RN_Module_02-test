@@ -1,6 +1,5 @@
 // slice об'єднує в собі actions та reducer
 import { createSlice } from "@reduxjs/toolkit";
-import { State } from "react-native-gesture-handler";
 
 // експорт authSlice буде експортувати ред'юсери з reducers з іменем "auth", а його початковий стан буде ===	initialState
 

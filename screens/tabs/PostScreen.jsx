@@ -6,6 +6,7 @@ const NestedStack = createStackNavigator();
 import DefaultScreenPosts from "../tabsNested/DefaultScreenPosts";
 import MapScreen from "../tabsNested/MapScreen";
 import CommentsScreen from "../tabsNested/CommentsScreen";
+
 // import { useSelector } from "react-redux";
 
 export default function NestedNavigation() {

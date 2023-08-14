@@ -19,10 +19,12 @@ export default function PostScreen() {
 	// }, [itemParams]);
 
 	const navigation = useNavigation();
-	const { params: itemParams } = useRoute(null);
+	console.log("CreateScreen >> navigation:", navigation);
+	const route = useRoute();
+	console.log("PostScreen >> route:", route.name);
+	// const { params: itemParams } = useRoute(null);
 
 	const [posts, setPosts] = useState([]); // array of objects
-	console.log("PostScreen >> posts:", posts);
 
 	useEffect(() => {
 		const unsubscribe = getAllPosts();

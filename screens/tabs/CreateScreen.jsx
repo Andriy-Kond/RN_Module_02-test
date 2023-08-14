@@ -13,17 +13,24 @@ import {
 } from "react-native";
 import { Camera, CameraType } from "expo-camera";
 import { useEffect, useRef, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
+import {
+	useNavigation,
+	useRoute,
+	useIsFocused,
+} from "@react-navigation/native";
 
 import * as Location from "expo-location";
 import * as MediaLibrary from "expo-media-library";
 
 import Modal from "react-native-modal";
 import { uriToBlob } from "../../utils/uriToBlob";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function CreateScreen() {
 	const navigation = useNavigation();
+	const isFocused = useIsFocused();
+	const route = useRoute();
+	const [isCameraReady, setIsCameraReady] = useState(null);
 
 	const cameraRef = useRef(null); // reference on camera in DOM
 	const [type, setType] = useState(CameraType.back);
@@ -32,8 +39,12 @@ export default function CreateScreen() {
 	const [permissionMediaLibrary, setPermissionMediaLibrary] = useState(null);
 	const [permissionCamera, setPermissionCamera] = useState(null);
 
+	const [isBtnSendEnabled, setIsBtnSendEnabled] = useState(false);
+
 	const [prevCapturedPhoto, setPrevCapturedPhoto] = useState(null);
+
 	const [capturedPhoto, setCapturedPhoto] = useState(null); // photo link
+
 	const [capturedLocation, setCapturedLocation] = useState(null);
 
 	// modal message
@@ -41,8 +52,6 @@ export default function CreateScreen() {
 	const [modalMessage, setModalMessage] = useState("");
 
 	const [imageComment, setImageComment] = useState("");
-
-	const [isBtnSendEnabled, setIsBtnSendEnabled] = useState(false);
 
 	const { userId, nickname } = useSelector((state) => state.auth);
 	const isShowModalMessagePopup = (message) => {
@@ -52,13 +61,6 @@ export default function CreateScreen() {
 	const hideMessagePopup = () => {
 		setIsShowModalMessage(false);
 	};
-
-	const resetState = () => {
-		setCapturedPhoto(null);
-		setPrevCapturedPhoto(null);
-		setIsBtnSendEnabled(false);
-	};
-	resetState();
 
 	// request accesses to camera, location and mediaLibrary
 	useEffect(() => {
@@ -81,21 +83,28 @@ export default function CreateScreen() {
 	}
 
 	const takePhoto = async () => {
-		if (cameraRef.current) {
-			const photo = await cameraRef.current.takePictureAsync();
+		try {
+			if (permissionCamera && cameraRef.current) {
+				const cam = await Camera.requestCameraPermissionsAsync();
+				setPermissionCamera(cam.status === "granted");
+				const photo = await cameraRef.current.takePictureAsync();
 
-			if (photo?.uri) {
-				setIsBtnSendEnabled(true);
-				setPrevCapturedPhoto(capturedPhoto);
-				setCapturedPhoto(photo.uri);
+				// Обробка фото
+				if (photo && photo.uri) {
+					setIsBtnSendEnabled(true);
+					setPrevCapturedPhoto(capturedPhoto);
+					setCapturedPhoto(photo.uri);
 
-				await MediaLibrary.createAssetAsync(photo.uri);
+					await MediaLibrary.createAssetAsync(photo.uri);
 
-				if (permissionLocation) {
-					const newLocation = await Location.getCurrentPositionAsync();
-					setCapturedLocation(newLocation);
+					if (permissionLocation) {
+						const newLocation = await Location.getCurrentPositionAsync();
+						setCapturedLocation(newLocation);
+					}
 				}
 			}
+		} catch (error) {
+			console.error("Error taking photo:", error);
 		}
 	};
 
@@ -108,6 +117,10 @@ export default function CreateScreen() {
 				setPrevCapturedPhoto(capturedPhoto);
 
 				await uploadPostToServer();
+
+				setCapturedPhoto(null);
+				setPrevCapturedPhoto(null);
+				setIsBtnSendEnabled(false);
 			} else {
 				isShowModalMessagePopup("You already have this photo. Make new one");
 			}
@@ -154,17 +167,19 @@ export default function CreateScreen() {
 			{permissionCamera === null ? (
 				<Text>Очікую доступу до камери...</Text>
 			) : !permissionCamera ? (
-				<Text>Немає доступу до камери</Text>
+				<Text>Немає доступу до камери. Надайте доступ у налаштуваннях</Text>
 			) : (
-				<Camera ref={cameraRef} style={styles.camera} type={type}>
-					{capturedPhoto && (
-						<View style={styles.photoImgContainer}>
-							<Image
-								source={{ uri: capturedPhoto }}
-								style={styles.photoImg}></Image>
-						</View>
-					)}
-				</Camera>
+				navigation.isFocused() && (
+					<Camera ref={cameraRef} style={styles.camera} type={type}>
+						{capturedPhoto && (
+							<View style={styles.photoImgContainer}>
+								<Image
+									source={{ uri: capturedPhoto }}
+									style={styles.photoImg}></Image>
+							</View>
+						)}
+					</Camera>
+				)
 			)}
 
 			<View style={styles.imageCommentContainer}>
@@ -222,10 +237,10 @@ const styles = StyleSheet.create({
 
 	photoImgContainer: {
 		flex: 1,
-		borderColor: "#fff",
 		borderWidth: 3,
 		borderWidth: 15,
 		borderColor: "#0021f9",
+		backgroundColor: "#e5d310",
 	},
 
 	photoImg: {
@@ -270,7 +285,7 @@ const styles = StyleSheet.create({
 
 	// Modal styles
 	modalContent: {
-		backgroundColor: "#fff",
+		backgroundColor: "#0fc6ef",
 		padding: 20,
 		borderRadius: 8,
 	},
@@ -286,7 +301,7 @@ const styles = StyleSheet.create({
 		backgroundColor: "#007BFF",
 	},
 	modalButtonText: {
-		color: "#fff",
+		color: "#550bdd",
 		fontWeight: "bold",
 	},
 

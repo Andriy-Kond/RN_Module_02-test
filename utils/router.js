@@ -10,12 +10,14 @@ import CreateScreen from "../screens/tabs/CreateScreen";
 import ProfileScreen from "../screens/tabs/ProfileScreen";
 
 // icons
-import { FontAwesome5 } from "@expo/vector-icons";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { SimpleLineIcons } from "@expo/vector-icons";
+import {
+	FontAwesome5,
+	MaterialCommunityIcons,
+	SimpleLineIcons,
+} from "@expo/vector-icons";
 
-const AuthStack = createStackNavigator();
 const MainStack = createBottomTabNavigator();
+const AuthStack = createStackNavigator();
 
 function AuthNavigation() {
 	return (
@@ -51,6 +53,7 @@ function TabsNavigation() {
 						<FontAwesome5 name="plus" size={35} color={color} />
 					),
 				}}
+				unmountOnBlur={true}
 				// listeners={({ navigation }) => ({
 				// 	tabPress: (event) => {
 				// 		if (resetState) {
@@ -70,6 +73,12 @@ function TabsNavigation() {
 				}}
 			/>
 		</MainStack.Navigator>
+	);
+}
+
+function CustomProfileButton() {
+	return ({ focused, color, size }) => (
+		<SimpleLineIcons name="user" size={size} color={color} />
 	);
 }
 
