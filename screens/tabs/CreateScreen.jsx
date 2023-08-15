@@ -13,47 +13,45 @@ import {
 } from "react-native";
 import { Camera, CameraType } from "expo-camera";
 import { useEffect, useRef, useState } from "react";
-import {
-	useNavigation,
-	useRoute,
-	useIsFocused,
-} from "@react-navigation/native";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
 
 import * as Location from "expo-location";
 import * as MediaLibrary from "expo-media-library";
 
 import Modal from "react-native-modal";
 import { uriToBlob } from "../../utils/uriToBlob";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
+import { useButtonState } from "../../utils/tabBtnsContext";
 
 export default function CreateScreen() {
+	const { toggleButtonsEnabled, isTabButtonsEnabled } = useButtonState();
+	console.log("CreateScreen >> isTabButtonsEnabled:", isTabButtonsEnabled);
+
+	// navigation
 	const navigation = useNavigation();
 	const isFocused = useIsFocused();
-	const route = useRoute();
-	const [isCameraReady, setIsCameraReady] = useState(null);
 
-	const cameraRef = useRef(null); // reference on camera in DOM
+	// reference on camera in DOM
+	const cameraRef = useRef(null);
 	const [type, setType] = useState(CameraType.back);
 
+	// permissions
 	const [permissionLocation, setPermissionLocation] = useState(null);
 	const [permissionMediaLibrary, setPermissionMediaLibrary] = useState(null);
 	const [permissionCamera, setPermissionCamera] = useState(null);
-
 	const [isBtnSendEnabled, setIsBtnSendEnabled] = useState(false);
 
+	// captured photo, location
 	const [prevCapturedPhoto, setPrevCapturedPhoto] = useState(null);
-
 	const [capturedPhoto, setCapturedPhoto] = useState(null); // photo link
-
 	const [capturedLocation, setCapturedLocation] = useState(null);
+
+	const [imageComment, setImageComment] = useState("");
+	const { userId, nickname } = useSelector((state) => state.auth);
 
 	// modal message
 	const [isShowModalMessage, setIsShowModalMessage] = useState(false);
 	const [modalMessage, setModalMessage] = useState("");
-
-	const [imageComment, setImageComment] = useState("");
-
-	const { userId, nickname } = useSelector((state) => state.auth);
 	const isShowModalMessagePopup = (message) => {
 		setModalMessage(message);
 		setIsShowModalMessage(true);
@@ -111,7 +109,7 @@ export default function CreateScreen() {
 	const sendPhoto = async () => {
 		if (capturedPhoto) {
 			if (capturedPhoto !== prevCapturedPhoto) {
-				navigation.navigate("DefaultScreenPosts");
+				await toggleButtonsEnabled(false); // lock tab-btns
 
 				setImageComment("");
 				setPrevCapturedPhoto(capturedPhoto);
@@ -121,6 +119,8 @@ export default function CreateScreen() {
 				setCapturedPhoto(null);
 				setPrevCapturedPhoto(null);
 				setIsBtnSendEnabled(false);
+				navigation.navigate("DefaultScreenPosts");
+				await toggleButtonsEnabled(true); // unlock tab-btns
 			} else {
 				isShowModalMessagePopup("You already have this photo. Make new one");
 			}
@@ -130,8 +130,6 @@ export default function CreateScreen() {
 	const uploadPostToServer = async () => {
 		const photo = await uploadPhotoToServer();
 		// send to db
-		console.log("uploadPostToServer >> capturedLocation:", capturedLocation);
-
 		if (capturedLocation) {
 			await addDoc(collection(dbFirestore, "dcim"), {
 				photo,
@@ -169,7 +167,14 @@ export default function CreateScreen() {
 			) : !permissionCamera ? (
 				<Text>Немає доступу до камери. Надайте доступ у налаштуваннях</Text>
 			) : (
-				navigation.isFocused() && (
+				isFocused &&
+				(!isTabButtonsEnabled ? (
+					<View style={styles.sendingMessageContainer}>
+						<Text style={styles.sendingMessage}>
+							Sending data to the server. {"\n"} Please wait.
+						</Text>
+					</View>
+				) : (
 					<Camera ref={cameraRef} style={styles.camera} type={type}>
 						{capturedPhoto && (
 							<View style={styles.photoImgContainer}>
@@ -179,7 +184,7 @@ export default function CreateScreen() {
 							</View>
 						)}
 					</Camera>
-				)
+				))
 			)}
 
 			<View style={styles.imageCommentContainer}>
@@ -229,6 +234,18 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		justifyContent: "flex-end",
+		paddingHorizontal: 10,
+	},
+
+	sendingMessageContainer: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+	},
+	sendingMessage: {
+		textAlign: "center",
+		fontSize: 36,
+		lineHeight: 50,
 	},
 
 	camera: {

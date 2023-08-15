@@ -16,6 +16,9 @@ import {
 	SimpleLineIcons,
 } from "@expo/vector-icons";
 
+// components
+import { useButtonState } from "../utils/tabBtnsContext";
+
 const MainStack = createBottomTabNavigator();
 const AuthStack = createStackNavigator();
 
@@ -29,6 +32,8 @@ function AuthNavigation() {
 }
 
 function TabsNavigation() {
+	const { isTabButtonsEnabled } = useButtonState();
+
 	return (
 		<MainStack.Navigator
 			screenOptions={{ tabBarShowLabel: false, headerShown: false }}>
@@ -40,9 +45,17 @@ function TabsNavigation() {
 						<MaterialCommunityIcons
 							name="postage-stamp"
 							size={size}
-							color={color}
+							color={isTabButtonsEnabled ? color : "#d7d7d7"}
 						/>
 					),
+				}}
+				listeners={{
+					tabPress: (e) => {
+						if (!isTabButtonsEnabled) {
+							e.preventDefault(); // Заборонити перехід на інший екран
+							// someFn(); // Викликати функцію перед переходом
+						}
+					},
 				}}
 			/>
 			<MainStack.Screen
@@ -50,26 +63,40 @@ function TabsNavigation() {
 				component={CreateScreen}
 				options={{
 					tabBarIcon: ({ focused, color, size }) => (
-						<FontAwesome5 name="plus" size={35} color={color} />
+						<FontAwesome5
+							name="plus"
+							size={35}
+							color={isTabButtonsEnabled ? color : "#d7d7d7"}
+						/>
 					),
 				}}
 				unmountOnBlur={true}
-				// listeners={({ navigation }) => ({
-				// 	tabPress: (event) => {
-				// 		if (resetState) {
-				// 			resetState(); // Викликаємо функцію обнулення стану перед переходом
-				// 		}
-				// 		navigation.navigate("Create");
-				// 	},
-				// })}
+				listeners={{
+					tabPress: (e) => {
+						if (!isTabButtonsEnabled) {
+							e.preventDefault();
+						}
+					},
+				}}
 			/>
 			<MainStack.Screen
 				name="Profile"
 				component={ProfileScreen}
 				options={{
 					tabBarIcon: ({ focused, color, size }) => (
-						<SimpleLineIcons name="user" size={size} color={color} />
+						<SimpleLineIcons
+							name="user"
+							size={size}
+							color={isTabButtonsEnabled ? color : "#d7d7d7"}
+						/>
 					),
+				}}
+				listeners={{
+					tabPress: (e) => {
+						if (!isTabButtonsEnabled) {
+							e.preventDefault();
+						}
+					},
 				}}
 			/>
 		</MainStack.Navigator>

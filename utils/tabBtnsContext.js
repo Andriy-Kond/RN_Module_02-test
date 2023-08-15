@@ -7,15 +7,15 @@ export const useButtonState = () => {
 };
 
 export const ButtonStateProvider = ({ children }) => {
-	const [isButtonsEnabled, setIsButtonsEnabled] = useState(true);
+	const [isTabButtonsEnabled, setIsTabButtonsEnabled] = useState(true);
 
-	const toggleButtonsEnabled = () => {
-		setIsButtonsEnabled(!isButtonsEnabled);
+	const toggleButtonsEnabled = (btnsState) => {
+		setIsTabButtonsEnabled(btnsState);
 	};
 
 	return (
 		<ButtonStateContext.Provider
-			value={{ isButtonsEnabled, toggleButtonsEnabled }}>
+			value={{ isTabButtonsEnabled, toggleButtonsEnabled }}>
 			{children}
 		</ButtonStateContext.Provider>
 	);
