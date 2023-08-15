@@ -1,18 +1,16 @@
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
 	ImageBackground,
 	StyleSheet,
 	Text,
 	View,
 	TextInput,
-	Button,
 	TouchableOpacity,
 	Platform,
 	KeyboardAvoidingView,
 	Keyboard,
 	TouchableWithoutFeedback,
-	Dimensions,
 } from "react-native";
 
 import backGroundImage from "./assets/japan.jpg";

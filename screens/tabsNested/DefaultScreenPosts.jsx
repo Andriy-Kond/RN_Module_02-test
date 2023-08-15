@@ -12,18 +12,8 @@ import { collection, getDocs, query, onSnapshot } from "firebase/firestore";
 import { dbFirestore } from "../../firebase/config";
 
 export default function PostScreen() {
-	// useEffect(() => {
-	// 	if (itemParams) {
-	// 		setPosts((prevState) => [...prevState, itemParams]);
-	// 	}
-	// }, [itemParams]);
-
 	const navigation = useNavigation();
-	console.log("CreateScreen >> navigation:", navigation);
 	const route = useRoute();
-	console.log("PostScreen >> route:", route.name);
-	// const { params: itemParams } = useRoute(null);
-
 	const [posts, setPosts] = useState([]); // array of objects
 
 	useEffect(() => {
@@ -34,9 +24,9 @@ export default function PostScreen() {
 	}, []);
 
 	const getAllPosts = async () => {
-		const postsQuery = query(collection(dbFirestore, "dcim"));
+		const postsRef = query(collection(dbFirestore, "dcim"));
 
-		const unsubscribe = onSnapshot(postsQuery, (snapshot) => {
+		const unsubscribe = onSnapshot(postsRef, (snapshot) => {
 			const arr = snapshot.docs.map((doc) => {
 				return {
 					id: doc.id,
@@ -64,6 +54,7 @@ export default function PostScreen() {
 								source={{ uri: item.data.photo }}
 								style={styles.currentImg}
 							/>
+							<Text>{item.data.imageTitle}</Text>
 							<View style={styles.buttonsWrapper}>
 								<TouchableOpacity
 									onPress={() =>
@@ -74,12 +65,9 @@ export default function PostScreen() {
 
 								<TouchableOpacity
 									onPress={() =>
-										navigation.navigate(
-											"CommentsScreen",
-											item.data.imageComment
-										)
+										navigation.navigate("CommentsScreen", item.data.imageTitle)
 									}>
-									<Text>Go to COMMENTS</Text>
+									<Text>Add COMMENT</Text>
 								</TouchableOpacity>
 							</View>
 						</View>
@@ -99,7 +87,7 @@ const styles = StyleSheet.create({
 
 	imgContainer: {
 		alignItems: "center",
-		marginBottom: 10,
+		marginBottom: 30,
 	},
 
 	imgTitle: {

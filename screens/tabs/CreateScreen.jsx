@@ -1,8 +1,11 @@
-import { dbFirestore, storage } from "../../firebase/config";
-import { collection, addDoc } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+// TODO: використання глаголиці
+// todo: кнопка для повторного фото, якщо перше не сподобалось
+// todo: додати кнопки наближення і віддалення на мапі
+// todo: Об'єднати логінскрін і регітрскрін
 
-// TODO: save photo on phone storage
+import { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
 import {
 	Image,
 	StyleSheet,
@@ -11,21 +14,20 @@ import {
 	View,
 	TextInput,
 } from "react-native";
-import { Camera, CameraType } from "expo-camera";
-import { useEffect, useRef, useState } from "react";
-import { useNavigation, useIsFocused } from "@react-navigation/native";
-
 import * as Location from "expo-location";
 import * as MediaLibrary from "expo-media-library";
-
+import { Camera, CameraType } from "expo-camera";
 import Modal from "react-native-modal";
+
+import { collection, addDoc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
+import { dbFirestore, storage } from "../../firebase/config";
 import { uriToBlob } from "../../utils/uriToBlob";
-import { useSelector } from "react-redux";
 import { useButtonState } from "../../utils/tabBtnsContext";
 
 export default function CreateScreen() {
 	const { toggleButtonsEnabled, isTabButtonsEnabled } = useButtonState();
-	console.log("CreateScreen >> isTabButtonsEnabled:", isTabButtonsEnabled);
 
 	// navigation
 	const navigation = useNavigation();
@@ -39,14 +41,19 @@ export default function CreateScreen() {
 	const [permissionLocation, setPermissionLocation] = useState(null);
 	const [permissionMediaLibrary, setPermissionMediaLibrary] = useState(null);
 	const [permissionCamera, setPermissionCamera] = useState(null);
+
+	// local btns
 	const [isBtnSendEnabled, setIsBtnSendEnabled] = useState(false);
+	console.log("CreateScreen >> isBtnSendEnabled:", isBtnSendEnabled);
+	const [isRestBtnsSendEnabled, setIsRestBtnsSendEnabled] = useState(true);
+	console.log("CreateScreen >> isRestBtnsSendEnabled:", isRestBtnsSendEnabled);
 
 	// captured photo, location
 	const [prevCapturedPhoto, setPrevCapturedPhoto] = useState(null);
 	const [capturedPhoto, setCapturedPhoto] = useState(null); // photo link
 	const [capturedLocation, setCapturedLocation] = useState(null);
 
-	const [imageComment, setImageComment] = useState("");
+	const [imageTitle, setImageTitle] = useState("");
 	const { userId, nickname } = useSelector((state) => state.auth);
 
 	// modal message
@@ -89,7 +96,8 @@ export default function CreateScreen() {
 
 				// Обробка фото
 				if (photo && photo.uri) {
-					setIsBtnSendEnabled(true);
+					setIsBtnSendEnabled(true); // unlock SEND-btn
+
 					setPrevCapturedPhoto(capturedPhoto);
 					setCapturedPhoto(photo.uri);
 
@@ -109,39 +117,44 @@ export default function CreateScreen() {
 	const sendPhoto = async () => {
 		if (capturedPhoto) {
 			if (capturedPhoto !== prevCapturedPhoto) {
+				setIsBtnSendEnabled(false); // lock SEND-btn
+				setIsRestBtnsSendEnabled(false); // lock other btns on this screen
 				await toggleButtonsEnabled(false); // lock tab-btns
 
-				setImageComment("");
+				setImageTitle("");
 				setPrevCapturedPhoto(capturedPhoto);
 
 				await uploadPostToServer();
 
 				setCapturedPhoto(null);
 				setPrevCapturedPhoto(null);
-				setIsBtnSendEnabled(false);
 				navigation.navigate("DefaultScreenPosts");
 				await toggleButtonsEnabled(true); // unlock tab-btns
+				setIsRestBtnsSendEnabled(true); // unlock other btns on this screen
 			} else {
-				isShowModalMessagePopup("You already have this photo. Make new one");
+				isShowModalMessagePopup("You already have this photo. Make a new one");
 			}
 		}
 	};
 
 	const uploadPostToServer = async () => {
+		console.log("start upload POST to server");
 		const photo = await uploadPhotoToServer();
 		// send to db
 		if (capturedLocation) {
 			await addDoc(collection(dbFirestore, "dcim"), {
 				photo,
-				imageComment,
+				imageTitle,
 				location: capturedLocation.coords,
 				userId,
 				nickname,
 			});
 		}
+		console.log("END upload POST to server");
 	};
 
 	const uploadPhotoToServer = async () => {
+		console.log("start upload PHOTO to server");
 		try {
 			// to BLOB from uri
 			const blobFile = await uriToBlob(capturedPhoto);
@@ -153,6 +166,7 @@ export default function CreateScreen() {
 
 			// take from server
 			const url = await getDownloadURL(storageRef);
+			console.log("END upload PHOTO to server");
 			return url;
 		} catch (e) {
 			console.error("Error adding data: ", e);
@@ -187,30 +201,43 @@ export default function CreateScreen() {
 				))
 			)}
 
-			<View style={styles.imageCommentContainer}>
+			<View style={styles.imageTitleContainer}>
 				<TextInput
-					style={styles.imageComment}
-					value={imageComment}
+					style={styles.imageTitle}
+					value={imageTitle}
 					onChangeText={(value) => {
-						setImageComment(value);
+						setImageTitle(value);
 					}}
 				/>
 			</View>
 
 			<View style={styles.buttonContainer}>
-				<TouchableOpacity style={styles.button} onPress={toggleCameraType}>
-					<Text style={styles.text}>Flip Camera</Text>
-				</TouchableOpacity>
-
-				<TouchableOpacity style={styles.button} onPress={takePhoto}>
-					<Text style={styles.text}>SNAP</Text>
+				<TouchableOpacity
+					style={[styles.button, !isRestBtnsSendEnabled && styles.disabled]}
+					onPress={toggleCameraType}
+					disabled={!isRestBtnsSendEnabled}>
+					<Text
+						style={[styles.text, !isRestBtnsSendEnabled && styles.disabled]}>
+						Flip Camera
+					</Text>
 				</TouchableOpacity>
 
 				<TouchableOpacity
-					style={[styles.button, !isBtnSendEnabled && styles.buttonDisabled]}
+					style={[styles.button, !isRestBtnsSendEnabled && styles.disabled]}
+					onPress={takePhoto}
+					disabled={!isRestBtnsSendEnabled}>
+					<Text
+						style={[styles.text, !isRestBtnsSendEnabled && styles.disabled]}>
+						SNAP
+					</Text>
+				</TouchableOpacity>
+
+				<TouchableOpacity
+					style={[styles.button, !isBtnSendEnabled && styles.disabled]}
 					onPress={sendPhoto}
 					disabled={!isBtnSendEnabled}>
-					<Text style={[styles.text, !isBtnSendEnabled && styles.textDisabled]}>
+					<Text
+						style={[styles.text, !isRestBtnsSendEnabled && styles.disabled]}>
 						SEND PHOTO
 					</Text>
 				</TouchableOpacity>
@@ -288,16 +315,13 @@ const styles = StyleSheet.create({
 		borderColor: "#0d0d0d7f",
 	},
 
-	buttonDisabled: {
-		borderColor: "#a9a8a87d",
+	disabled: {
+		borderColor: "#d7d7d7",
+		color: "#d7d7d7",
 	},
 
 	text: {
 		color: "#000",
-	},
-
-	textDisabled: {
-		color: "#a9a8a87d",
 	},
 
 	// Modal styles
@@ -323,14 +347,14 @@ const styles = StyleSheet.create({
 	},
 
 	// Image Comment
-	imageCommentContainer: {
+	imageTitleContainer: {
 		marginHorizontal: 10,
 		borderWidth: 2,
 		borderRadius: 50,
 		borderColor: "#007BFF",
 		marginVertical: 10,
 	},
-	imageComment: {
+	imageTitle: {
 		color: "#000",
 	},
 });

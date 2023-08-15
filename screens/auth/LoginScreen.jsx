@@ -1,7 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-
 import {
 	ImageBackground,
 	StyleSheet,
@@ -17,7 +16,6 @@ import {
 
 import { useDispatch } from "react-redux";
 import { authSingInUser } from "../../redux/auth/authOperations";
-
 import backGroundImage from "../../assets/japan.jpg";
 
 const initialState = {
@@ -37,8 +35,7 @@ export default function LoginScreen() {
 	};
 
 	const submitForm = () => {
-		setIsShownKB(false);
-		Keyboard.dismiss();
+		hideKB();
 		dispatch(authSingInUser(state));
 		setState(initialState);
 	};
@@ -57,12 +54,12 @@ export default function LoginScreen() {
 							style={{
 								...styles.form,
 								marginBottom: isShownKB ? 10 : 100,
-								// width: dimensions,
 							}}>
 							<View>
 								<Text style={styles.inputTitle}>Email address</Text>
 								<TextInput
 									style={styles.input}
+									onSubmitEditing={hideKB}
 									onFocus={() => setIsShownKB(true)}
 									value={state.email}
 									onChangeText={(value) => {
@@ -72,10 +69,12 @@ export default function LoginScreen() {
 									}}
 								/>
 							</View>
+
 							<View style={{ marginTop: 20 }}>
 								<Text style={styles.inputTitle}>Password</Text>
 								<TextInput
 									style={styles.input}
+									onSubmitEditing={hideKB}
 									secureTextEntry
 									onFocus={() => setIsShownKB(true)}
 									value={state.password}
@@ -86,6 +85,7 @@ export default function LoginScreen() {
 									}}
 								/>
 							</View>
+
 							{!isShownKB && (
 								<>
 									<TouchableOpacity

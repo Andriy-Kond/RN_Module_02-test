@@ -15,12 +15,7 @@ import {
 } from "react-native";
 
 import { useDispatch } from "react-redux";
-import {
-	authSingOutUser,
-	authSingInUser,
-	authSingUpUser,
-} from "../../redux/auth/authOperations";
-
+import { authSingUpUser } from "../../redux/auth/authOperations";
 import backGroundImage from "../../assets/japan.jpg";
 
 const initialState = {
@@ -30,11 +25,10 @@ const initialState = {
 };
 
 export default function RegisterScreen() {
+	const dispatch = useDispatch();
 	const navigation = useNavigation();
 	const [isShownKB, setIsShownKB] = useState(false);
 	const [state, setState] = useState(initialState);
-
-	const dispatch = useDispatch();
 
 	const hideKB = () => {
 		setIsShownKB(false);
@@ -42,8 +36,7 @@ export default function RegisterScreen() {
 	};
 
 	const submitForm = () => {
-		setIsShownKB(false);
-		Keyboard.dismiss();
+		hideKB();
 		dispatch(authSingUpUser(state));
 		setState(initialState);
 	};
@@ -62,7 +55,6 @@ export default function RegisterScreen() {
 							style={{
 								...styles.form,
 								marginBottom: isShownKB ? 10 : 100,
-								// width: dimensions,
 							}}>
 							<View>
 								<Text style={styles.inputTitle}>Login</Text>
@@ -203,7 +195,6 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		justifyContent: "center",
 		borderRadius: 10,
-		paddingHorizontal: 20,
 	},
 	btnText: {
 		color: "white",

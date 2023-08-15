@@ -10,6 +10,7 @@ import bold700 from "./assets/fonts/Roboto-Bold-700.ttf";
 import { store } from "./redux/store";
 import Main from "./components/Main";
 import { ButtonStateProvider } from "./utils/tabBtnsContext";
+import { KeyboardStateProvider } from "./utils/keyboardContext";
 
 export default function App() {
 	const [fontsLoaded] = useFonts({
@@ -25,9 +26,11 @@ export default function App() {
 
 	return (
 		<Provider store={store}>
-			<ButtonStateProvider>
-				<Main></Main>
-			</ButtonStateProvider>
+			<KeyboardStateProvider>
+				<ButtonStateProvider>
+					<Main></Main>
+				</ButtonStateProvider>
+			</KeyboardStateProvider>
 		</Provider>
 	);
 }
