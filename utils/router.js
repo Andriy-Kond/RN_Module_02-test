@@ -36,7 +36,11 @@ function TabsNavigation() {
 
 	return (
 		<MainStack.Navigator
-			screenOptions={{ tabBarShowLabel: false, headerShown: false }}>
+			screenOptions={{
+				// tabBarHideOnKeyboard: true, // Встановлюємо властивість для таб-бара
+				tabBarShowLabel: false,
+				headerShown: false,
+			}}>
 			<MainStack.Screen
 				name="Post"
 				component={PostScreen}

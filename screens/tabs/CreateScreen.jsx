@@ -26,7 +26,11 @@ import { dbFirestore, storage } from "../../firebase/config";
 import { uriToBlob } from "../../utils/uriToBlob";
 import { useButtonState } from "../../utils/tabBtnsContext";
 
+import { useKeyboardState } from "../../utils/keyboardContext";
+import { TouchableWithoutFeedback } from "react-native";
+
 export default function CreateScreen() {
+	const { isKeyboardShown, hideKB } = useKeyboardState();
 	const { toggleButtonsEnabled, isTabButtonsEnabled } = useButtonState();
 
 	// navigation
@@ -175,85 +179,89 @@ export default function CreateScreen() {
 	};
 
 	return (
-		<View style={styles.container}>
-			{permissionCamera === null ? (
-				<Text>Очікую доступу до камери...</Text>
-			) : !permissionCamera ? (
-				<Text>Немає доступу до камери. Надайте доступ у налаштуваннях</Text>
-			) : (
-				isFocused &&
-				(!isTabButtonsEnabled ? (
-					<View style={styles.sendingMessageContainer}>
-						<Text style={styles.sendingMessage}>
-							Sending data to the server. {"\n"} Please wait.
-						</Text>
-					</View>
+		<TouchableWithoutFeedback onPress={hideKB}>
+			<View style={styles.container}>
+				{permissionCamera === null ? (
+					<Text>Очікую доступу до камери...</Text>
+				) : !permissionCamera ? (
+					<Text>Немає доступу до камери. Надайте доступ у налаштуваннях</Text>
 				) : (
-					<Camera ref={cameraRef} style={styles.camera} type={type}>
-						{capturedPhoto && (
-							<View style={styles.photoImgContainer}>
-								<Image
-									source={{ uri: capturedPhoto }}
-									style={styles.photoImg}></Image>
-							</View>
-						)}
-					</Camera>
-				))
-			)}
+					isFocused &&
+					(!isTabButtonsEnabled ? (
+						<View style={styles.sendingMessageContainer}>
+							<Text style={styles.sendingMessage}>
+								Sending data to the server. {"\n"} Please wait.
+							</Text>
+						</View>
+					) : (
+						<Camera ref={cameraRef} style={styles.camera} type={type}>
+							{capturedPhoto && (
+								<View style={styles.photoImgContainer}>
+									<Image
+										source={{ uri: capturedPhoto }}
+										style={styles.photoImg}></Image>
+								</View>
+							)}
+						</Camera>
+					))
+				)}
 
-			<View style={styles.imageTitleContainer}>
-				<TextInput
-					style={styles.imageTitle}
-					value={imageTitle}
-					onChangeText={(value) => {
-						setImageTitle(value);
-					}}
-				/>
-			</View>
+				<View style={styles.imageTitleContainer}>
+					<TextInput
+						style={styles.imageTitle}
+						value={imageTitle}
+						onChangeText={(value) => {
+							setImageTitle(value);
+						}}
+					/>
+				</View>
 
-			<View style={styles.buttonContainer}>
-				<TouchableOpacity
-					style={[styles.button, !isRestBtnsSendEnabled && styles.disabled]}
-					onPress={toggleCameraType}
-					disabled={!isRestBtnsSendEnabled}>
-					<Text
-						style={[styles.text, !isRestBtnsSendEnabled && styles.disabled]}>
-						Flip Camera
-					</Text>
-				</TouchableOpacity>
-
-				<TouchableOpacity
-					style={[styles.button, !isRestBtnsSendEnabled && styles.disabled]}
-					onPress={takePhoto}
-					disabled={!isRestBtnsSendEnabled}>
-					<Text
-						style={[styles.text, !isRestBtnsSendEnabled && styles.disabled]}>
-						SNAP
-					</Text>
-				</TouchableOpacity>
-
-				<TouchableOpacity
-					style={[styles.button, !isBtnSendEnabled && styles.disabled]}
-					onPress={sendPhoto}
-					disabled={!isBtnSendEnabled}>
-					<Text
-						style={[styles.text, !isRestBtnsSendEnabled && styles.disabled]}>
-						SEND PHOTO
-					</Text>
-				</TouchableOpacity>
-			</View>
-
-			<Modal isVisible={isShowModalMessage} onBackdropPress={hideMessagePopup}>
-				<View style={styles.modalContent}>
-					<Text style={styles.modalText}>{modalMessage}</Text>
+				<View style={styles.buttonContainer}>
 					<TouchableOpacity
-						onPress={hideMessagePopup}
-						style={styles.modalButton}>
-						<Text style={styles.modalButtonText}>OK</Text>
+						style={[styles.button, !isRestBtnsSendEnabled && styles.disabled]}
+						onPress={toggleCameraType}
+						disabled={!isRestBtnsSendEnabled}>
+						<Text
+							style={[styles.text, !isRestBtnsSendEnabled && styles.disabled]}>
+							Flip Camera
+						</Text>
+					</TouchableOpacity>
+
+					<TouchableOpacity
+						style={[styles.button, !isRestBtnsSendEnabled && styles.disabled]}
+						onPress={takePhoto}
+						disabled={!isRestBtnsSendEnabled}>
+						<Text
+							style={[styles.text, !isRestBtnsSendEnabled && styles.disabled]}>
+							SNAP
+						</Text>
+					</TouchableOpacity>
+
+					<TouchableOpacity
+						style={[styles.button, !isBtnSendEnabled && styles.disabled]}
+						onPress={sendPhoto}
+						disabled={!isBtnSendEnabled}>
+						<Text
+							style={[styles.text, !isRestBtnsSendEnabled && styles.disabled]}>
+							SEND PHOTO
+						</Text>
 					</TouchableOpacity>
 				</View>
-			</Modal>
-		</View>
+
+				<Modal
+					isVisible={isShowModalMessage}
+					onBackdropPress={hideMessagePopup}>
+					<View style={styles.modalContent}>
+						<Text style={styles.modalText}>{modalMessage}</Text>
+						<TouchableOpacity
+							onPress={hideMessagePopup}
+							style={styles.modalButton}>
+							<Text style={styles.modalButtonText}>OK</Text>
+						</TouchableOpacity>
+					</View>
+				</Modal>
+			</View>
+		</TouchableWithoutFeedback>
 	);
 }
 

@@ -10,10 +10,6 @@ export const useKeyboardState = () => {
 export const KeyboardStateProvider = ({ children }) => {
 	const [isKeyboardShown, setIsKeyboardShown] = useState(false);
 
-	const toggleKeyboardState = (kbState) => {
-		setIsKeyboardShown(kbState);
-	};
-
 	const hideKB = () => {
 		setIsKeyboardShown(false);
 		Keyboard.dismiss();
@@ -23,7 +19,7 @@ export const KeyboardStateProvider = ({ children }) => {
 		<keyboardStateContext.Provider
 			value={{
 				isKeyboardShown,
-				toggleKeyboardState,
+				setIsKeyboardShown,
 				hideKB,
 			}}>
 			{children}

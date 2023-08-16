@@ -18,21 +18,18 @@ import { useDispatch } from "react-redux";
 import { authSingInUser } from "../../redux/auth/authOperations";
 import backGroundImage from "../../assets/japan.jpg";
 
+import { useKeyboardState } from "../../utils/keyboardContext";
+
 const initialState = {
 	email: "",
 	password: "",
 };
 
 export default function LoginScreen() {
+	const { isKeyboardShown, setIsKeyboardShown, hideKB } = useKeyboardState();
 	const dispatch = useDispatch();
 	const navigation = useNavigation();
-	const [isShownKB, setIsShownKB] = useState(false);
 	const [state, setState] = useState(initialState);
-
-	const hideKB = () => {
-		setIsShownKB(false);
-		Keyboard.dismiss();
-	};
 
 	const submitForm = () => {
 		hideKB();
@@ -53,14 +50,14 @@ export default function LoginScreen() {
 						<View
 							style={{
 								...styles.form,
-								marginBottom: isShownKB ? 10 : 100,
+								marginBottom: isKeyboardShown ? 10 : 100,
 							}}>
 							<View>
 								<Text style={styles.inputTitle}>Email address</Text>
 								<TextInput
 									style={styles.input}
 									onSubmitEditing={hideKB}
-									onFocus={() => setIsShownKB(true)}
+									onFocus={() => setIsKeyboardShown(true)}
 									value={state.email}
 									onChangeText={(value) => {
 										setState((prevState) => {
@@ -76,7 +73,7 @@ export default function LoginScreen() {
 									style={styles.input}
 									onSubmitEditing={hideKB}
 									secureTextEntry
-									onFocus={() => setIsShownKB(true)}
+									onFocus={() => setIsKeyboardShown(true)}
 									value={state.password}
 									onChangeText={(value) => {
 										setState((prevState) => {
@@ -86,7 +83,7 @@ export default function LoginScreen() {
 								/>
 							</View>
 
-							{!isShownKB && (
+							{!isKeyboardShown && (
 								<>
 									<TouchableOpacity
 										activeOpacity={0.8}
