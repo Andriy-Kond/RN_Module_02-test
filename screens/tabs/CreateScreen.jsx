@@ -48,9 +48,7 @@ export default function CreateScreen() {
 
 	// local btns
 	const [isBtnSendEnabled, setIsBtnSendEnabled] = useState(false);
-	console.log("CreateScreen >> isBtnSendEnabled:", isBtnSendEnabled);
 	const [isRestBtnsSendEnabled, setIsRestBtnsSendEnabled] = useState(true);
-	console.log("CreateScreen >> isRestBtnsSendEnabled:", isRestBtnsSendEnabled);
 
 	// captured photo, location
 	const [prevCapturedPhoto, setPrevCapturedPhoto] = useState(null);

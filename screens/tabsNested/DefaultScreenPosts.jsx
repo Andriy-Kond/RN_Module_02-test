@@ -8,13 +8,14 @@ import {
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useEffect, useState } from "react";
-import { collection, getDocs, query, onSnapshot } from "firebase/firestore";
+import { collection, query, onSnapshot } from "firebase/firestore";
 import { dbFirestore } from "../../firebase/config";
 
 export default function PostScreen() {
 	const navigation = useNavigation();
 	const route = useRoute();
-	const [posts, setPosts] = useState([]); // array of objects
+	const [posts, setPosts] = useState([]);
+	console.log("PostScreen >> posts:", posts);
 
 	useEffect(() => {
 		const unsubscribe = getAllPosts();
@@ -24,9 +25,9 @@ export default function PostScreen() {
 	}, []);
 
 	const getAllPosts = async () => {
-		const postsRef = query(collection(dbFirestore, "dcim"));
+		const dcimCollection = query(collection(dbFirestore, "dcim"));
 
-		const unsubscribe = onSnapshot(postsRef, (snapshot) => {
+		const unsubscribe = onSnapshot(dcimCollection, (snapshot) => {
 			const arr = snapshot.docs.map((doc) => {
 				return {
 					id: doc.id,
@@ -46,6 +47,7 @@ export default function PostScreen() {
 				keyExtractor={(item, indx) => item.id}
 				renderItem={({ item }) => {
 					const indx = posts.indexOf(item);
+					console.log("PostScreen >> item:", item);
 
 					return (
 						<View style={styles.imgContainer}>
@@ -65,7 +67,10 @@ export default function PostScreen() {
 
 								<TouchableOpacity
 									onPress={() =>
-										navigation.navigate("CommentsScreen", item.data.imageTitle)
+										navigation.navigate("CommentsScreen", {
+											imageTitle: item.data.imageTitle,
+											postId: item.id,
+										})
 									}>
 									<Text>Add COMMENT</Text>
 								</TouchableOpacity>

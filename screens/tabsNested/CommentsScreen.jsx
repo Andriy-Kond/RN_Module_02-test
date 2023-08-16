@@ -10,15 +10,51 @@ import {
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
 
+// export const getDataFromFirestore = async () => {
+// 	try {
+// 		// getDocs - отримує дані з колекції
+// 		const snapshot = await getDocs(collection(db, "users"));
+// 		// Перевіряємо у консолі отримані дані
+// 		snapshot.forEach((doc) => console.log(`${doc.id} =>`, doc.data()));
+// 		// Повертаємо масив об'єктів у довільній формі
+// 		return snapshot.map((doc) => ({ id: doc.id, data: doc.data() }));
+// 	} catch (error) {
+// 		console.log(error);
+// 		throw error;
+// 	}
+// };
+import { dbFirestore } from "../../firebase/config";
+import { collection, doc, getDocs, setDoc, addDoc } from "firebase/firestore";
+
 import { useKeyboardState } from "../../utils/keyboardContext";
+import { useSelector } from "react-redux";
 
 export default function CommentsScreen() {
 	const { isKeyboardShown, hideKB } = useKeyboardState();
-	const { params: imageTitle } = useRoute();
+	const currentUser = useSelector((store) => store.auth.nickname);
+
+	const {
+		params: { postId, imageTitle },
+	} = useRoute();
+
 	const [imageComment, setImageComment] = useState("");
 
-	const createComment = () => {
+	const createComment = async () => {
 		hideKB();
+		const currentPostRef = doc(dbFirestore, "dcim", postId);
+		// await setDoc(currentPostRef, {
+		// 	comment: imageComment,
+		// 	userNickName: currentUser,
+		// });
+		await addDoc(collection(currentPostRef, "comments"), {
+			comment: imageComment,
+			userNickName: currentUser,
+		});
+
+		// const currentPost = await getDocs(collection(dbFirestore, "dcim", postId));
+		// await addDoc(collection(currentPost, "comments"), {
+		// 	imageComment,
+		// });
 	};
 
 	return (
