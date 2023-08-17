@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	StyleSheet,
 	Text,
@@ -7,6 +7,7 @@ import {
 	TouchableOpacity,
 	Image,
 	TouchableWithoutFeedback,
+	FlatList,
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
 
@@ -24,10 +25,19 @@ import { useRoute } from "@react-navigation/native";
 // 	}
 // };
 import { dbFirestore } from "../../firebase/config";
-import { collection, doc, getDocs, setDoc, addDoc } from "firebase/firestore";
+import {
+	collection,
+	doc,
+	getDocs,
+	setDoc,
+	addDoc,
+	query,
+	onSnapshot,
+} from "firebase/firestore";
 
 import { useKeyboardState } from "../../utils/keyboardContext";
 import { useSelector } from "react-redux";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function CommentsScreen() {
 	const { isKeyboardShown, hideKB } = useKeyboardState();
@@ -38,30 +48,63 @@ export default function CommentsScreen() {
 	} = useRoute();
 
 	const [imageComment, setImageComment] = useState("");
+	const [comments, setComments] = useState([]);
+
+	useEffect(() => {
+		const unsubscribe = getAllComments();
+		return () => {
+			unsubscribe();
+		};
+	}, []);
+
+	const getAllComments = async () => {
+		const currentPostRef = doc(dbFirestore, "dcim", postId);
+		const commentsCollection = query(collection(currentPostRef, "comments"));
+
+		const unsubscribe = onSnapshot(commentsCollection, (snapshot) => {
+			const arr = snapshot.docs.map((doc) => {
+				return {
+					id: doc.id,
+					data: doc.data(),
+				};
+			});
+			setComments(arr);
+		});
+		return unsubscribe;
+	};
 
 	const createComment = async () => {
 		hideKB();
+		setImageComment("");
 		const currentPostRef = doc(dbFirestore, "dcim", postId);
-		// await setDoc(currentPostRef, {
-		// 	comment: imageComment,
-		// 	userNickName: currentUser,
-		// });
 		await addDoc(collection(currentPostRef, "comments"), {
 			comment: imageComment,
 			userNickName: currentUser,
 		});
-
-		// const currentPost = await getDocs(collection(dbFirestore, "dcim", postId));
-		// await addDoc(collection(currentPost, "comments"), {
-		// 	imageComment,
-		// });
 	};
 
 	return (
 		<TouchableWithoutFeedback onPress={hideKB}>
 			<View style={styles.container}>
 				<Text style={styles.screenTitle}>Add comment in area below</Text>
-				<Text>{imageTitle}</Text>
+				<Text style={styles.imageTitle}>Image title: {imageTitle}</Text>
+
+				<FlatList
+					data={comments}
+					keyExtractor={(item, indx) => item.id}
+					renderItem={({ item }) => {
+						const indx = comments.indexOf(item);
+						console.log("CommentsScreen >> item:", item);
+
+						return (
+							<SafeAreaView style={styles.commentContainer}>
+								<Text>Comment #{indx + 1}</Text>
+								<Text>User: {item.data.userNickName}</Text>
+								<Text>Comment: {item.data.comment}</Text>
+							</SafeAreaView>
+						);
+					}}
+				/>
 
 				<View style={styles.imageCommentContainer}>
 					<TextInput
@@ -98,6 +141,21 @@ const styles = StyleSheet.create({
 
 	screenTitle: {
 		alignSelf: "center",
+		marginVertical: 15,
+		fontSize: 20,
+	},
+
+	imageTitle: {
+		marginBottom: 5,
+		fontSize: 16,
+	},
+
+	commentContainer: {
+		flex: 1,
+		borderColor: "#007BFF",
+		borderWidth: 2,
+		marginBottom: 5,
+		padding: 5,
 	},
 
 	// Image Comment

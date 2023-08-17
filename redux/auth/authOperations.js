@@ -55,7 +55,7 @@ export const authSingInUser =
 	};
 
 export const authStateChangeUser = () => async (dispatch, getState) => {
-	await onAuthStateChanged(auth, (user) => {
+	onAuthStateChanged(auth, (user) => {
 		if (user) {
 			dispatch(
 				authSlice.actions.updateUserProfile({
@@ -69,6 +69,16 @@ export const authStateChangeUser = () => async (dispatch, getState) => {
 };
 
 export const authSingOutUser = () => async (dispatch, getState) => {
-	await signOut(auth);
+	// await signOut(auth);
+
+	signOut(auth)
+		.then(() => {
+			// Sign-out successful.
+			console.log("Sign-out successful");
+		})
+		.catch((error) => {
+			// An error happened.
+			console.log("An error happened :>> ", error);
+		});
 	await dispatch(authSlice.actions.authSingOut());
 };

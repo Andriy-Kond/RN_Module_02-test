@@ -15,7 +15,6 @@ export default function PostScreen() {
 	const navigation = useNavigation();
 	const route = useRoute();
 	const [posts, setPosts] = useState([]);
-	console.log("PostScreen >> posts:", posts);
 
 	useEffect(() => {
 		const unsubscribe = getAllPosts();
@@ -47,11 +46,10 @@ export default function PostScreen() {
 				keyExtractor={(item, indx) => item.id}
 				renderItem={({ item }) => {
 					const indx = posts.indexOf(item);
-					console.log("PostScreen >> item:", item);
 
 					return (
 						<View style={styles.imgContainer}>
-							<Text Style={styles.imgTitle}>Image number: {indx + 1}</Text>
+							<Text Style={styles.imgTitle}>Image #{indx + 1}</Text>
 							<Image
 								source={{ uri: item.data.photo }}
 								style={styles.currentImg}
