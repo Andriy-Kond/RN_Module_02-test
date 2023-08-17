@@ -43,17 +43,14 @@ export default function CommentsScreen() {
 	const [comments, setComments] = useState([]);
 
 	useEffect(() => {
-		const unsubscribe = getAllComments();
-		return () => {
-			unsubscribe();
-		};
+		getAllComments();
 	}, []);
 
 	const getAllComments = async () => {
 		const currentPostRef = doc(dbFirestore, "dcim", postId);
 		const commentsCollection = query(collection(currentPostRef, "comments"));
 
-		const unsubscribe = onSnapshot(commentsCollection, (snapshot) => {
+		onSnapshot(commentsCollection, (snapshot) => {
 			const arr = snapshot.docs.map((doc) => {
 				return {
 					id: doc.id,
@@ -62,7 +59,6 @@ export default function CommentsScreen() {
 			});
 			setComments(arr);
 		});
-		return unsubscribe;
 	};
 
 	const createComment = async () => {

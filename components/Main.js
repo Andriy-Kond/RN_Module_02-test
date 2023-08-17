@@ -8,8 +8,6 @@ const Main = () => {
 	const dispatch = useDispatch();
 
 	const stateChange = useSelector((state) => state.auth.stateChange);
-	const userId = useSelector((state) => state.auth.userId);
-	const nickname = useSelector((state) => state.auth.nickname);
 
 	useEffect(() => {
 		dispatch(authStateChangeUser());

@@ -21,10 +21,7 @@ export default function ProfileScreen() {
 	const currentUser = useSelector((store) => store.auth.userId);
 
 	useEffect(() => {
-		const unsubscribe = getAllCurrentUserPosts();
-		return () => {
-			unsubscribe();
-		};
+		getAllCurrentUserPosts();
 	}, []);
 
 	const signOut = () => {
@@ -37,7 +34,7 @@ export default function ProfileScreen() {
 			where("userId", "==", currentUser)
 		);
 
-		const unsubscribe = onSnapshot(dcimCurrentUserCollection, (snapshot) => {
+		onSnapshot(dcimCurrentUserCollection, (snapshot) => {
 			const arr = snapshot.docs.map((doc) => {
 				return {
 					id: doc.id,
@@ -46,7 +43,6 @@ export default function ProfileScreen() {
 			});
 			setCurrentUserPosts(arr);
 		});
-		return unsubscribe;
 	};
 
 	return (

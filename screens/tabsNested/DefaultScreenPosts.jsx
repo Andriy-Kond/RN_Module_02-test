@@ -16,16 +16,13 @@ export default function DefaultScreenPosts() {
 	const [posts, setPosts] = useState([]);
 
 	useEffect(() => {
-		const unsubscribe = getAllPosts();
-		return () => {
-			unsubscribe();
-		};
+		getAllPosts();
 	}, []);
 
 	const getAllPosts = async () => {
 		const dcimCollection = query(collection(dbFirestore, "dcim"));
 
-		const unsubscribe = onSnapshot(dcimCollection, (snapshot) => {
+		onSnapshot(dcimCollection, (snapshot) => {
 			const arr = snapshot.docs.map((doc) => {
 				return {
 					id: doc.id,
@@ -34,7 +31,6 @@ export default function DefaultScreenPosts() {
 			});
 			setPosts(arr);
 		});
-		return unsubscribe;
 	};
 
 	return (

@@ -60,8 +60,8 @@ export const authStateChangeUser = () => async (dispatch, getState) => {
 				userId: user.uid,
 				nickname: user.displayName,
 			};
-			dispatch(updateStateChange({ stateChange: true }));
 			dispatch(updateUserProfile(userUpdateProfile));
+			dispatch(updateStateChange({ stateChange: true }));
 		}
 	});
 };

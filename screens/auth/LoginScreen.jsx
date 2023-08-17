@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	text: {
-		color: "black",
+		color: "#000",
 		fontSize: 30,
 	},
 	form: {
@@ -155,17 +155,18 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		padding: 5,
 		fontFamily: "bold700",
-		color: "magenta",
+		color: "#fe0606",
 	},
 	input: {
-		borderWidth: 1,
+		borderWidth: 2,
 		height: 50,
-		borderColor: "black",
+		borderColor: "#000",
 		paddingHorizontal: 20,
 		borderRadius: 10,
-		color: "green",
+		color: "#fff",
 		textAlign: "center",
 		fontSize: 24,
+		backgroundColor: "rgba(0, 0, 0, 0.5)",
 	},
 	btn: {
 		marginVertical: 20,
@@ -176,7 +177,7 @@ const styles = StyleSheet.create({
 		borderRadius: 10,
 	},
 	btnText: {
-		color: "white",
+		color: "#fff",
 		fontSize: 20,
 		fontFamily: "regular400",
 	},
