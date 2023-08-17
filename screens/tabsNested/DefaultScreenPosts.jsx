@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import { collection, query, onSnapshot } from "firebase/firestore";
 import { dbFirestore } from "../../firebase/config";
 
-export default function PostScreen() {
+export default function DefaultScreenPosts() {
 	const navigation = useNavigation();
 	const [posts, setPosts] = useState([]);
 

@@ -77,19 +77,18 @@ export default function CreateScreen() {
 	}
 
 	const takePhoto = async () => {
-		console.log("takePhoto start");
 		try {
 			if (permissionCamera && cameraRef.current) {
 				const photo = await cameraRef.current.takePictureAsync();
 
 				// Обробка фото
 				if (photo && photo.uri) {
-					setIsBtnSendEnabled(true); // unlock SEND-btn
 					setCapturedPhoto(photo.uri);
 					await MediaLibrary.createAssetAsync(photo.uri);
 					if (permissionLocation) {
 						const newLocation = await Location.getCurrentPositionAsync();
 						setCapturedLocation(newLocation);
+						setIsBtnSendEnabled(true); // unlock SEND-btn
 					}
 				}
 			}

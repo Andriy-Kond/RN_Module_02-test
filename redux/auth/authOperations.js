@@ -68,8 +68,8 @@ export const authStateChangeUser = () => async (dispatch, getState) => {
 
 export const authSingOutUser = () => async (dispatch, getState) => {
 	try {
+		await dispatch(authSingOut()); // clear redux
 		await signOut(auth); // exit on firebase
-		dispatch(authSingOut()); // clear redux
 	} catch (error) {
 		console.log("authSingOutUser >> error:", error);
 	}
