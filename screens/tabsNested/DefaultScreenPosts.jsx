@@ -13,7 +13,6 @@ import { dbFirestore } from "../../firebase/config";
 
 export default function PostScreen() {
 	const navigation = useNavigation();
-	const route = useRoute();
 	const [posts, setPosts] = useState([]);
 
 	useEffect(() => {

@@ -17,7 +17,6 @@ import { dbFirestore } from "../../firebase/config";
 export default function ProfileScreen() {
 	const dispatch = useDispatch();
 	const navigation = useNavigation();
-	const route = useRoute();
 	const [currentUserPosts, setCurrentUserPosts] = useState([]);
 	const currentUser = useSelector((store) => store.auth.userId);
 
@@ -33,9 +32,6 @@ export default function ProfileScreen() {
 	};
 
 	const getAllCurrentUserPosts = async () => {
-		// const currentUserRef = doc(dbFirestore, "dcim");
-		// const dcimCollection = query(collection(dbFirestore, "dcim"));
-
 		const dcimCurrentUserCollection = query(
 			collection(dbFirestore, "dcim"),
 			where("userId", "==", currentUser)
@@ -64,7 +60,6 @@ export default function ProfileScreen() {
 					keyExtractor={(item, indx) => item.id}
 					renderItem={({ item }) => {
 						const indx = currentUserPosts.indexOf(item);
-						console.log("PostScreen >> item:", item);
 
 						return (
 							<View style={styles.imgContainer}>
@@ -104,8 +99,6 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		// justifyContent: "center",
-		// alignItems: "center",
 		paddingHorizontal: 30,
 		paddingVertical: 30,
 	},

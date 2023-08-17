@@ -10,9 +10,6 @@ import CommentsScreen from "../tabsNested/CommentsScreen";
 // import { useSelector } from "react-redux";
 
 export default function NestedNavigation() {
-	// const state01 = useSelector((store) => store.auth.nickname);
-	// console.log("state01 :>> 01", state01);
-
 	return (
 		<NestedStack.Navigator
 		// screenOptions={{ headerShown: false }}

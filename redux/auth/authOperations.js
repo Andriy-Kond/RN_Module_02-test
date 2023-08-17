@@ -32,20 +32,13 @@ export const authSingUpUser = ({ email, password, nickname }) => {
 			// 	password
 			// );
 
-			// dispatch(
-			// 	updateUserProfile({
-			// 		userId: userCredential.user.uid,
-			// 		nickname: userCredential.user.displayName,
-			// 	})
-			// );
 			const userUpdateProfile = {
 				userId: userCredential.user.uid,
 				nickname: userCredential.user.displayName,
 			};
-			dispatch(updateUserProfile(userUpdateProfil));
+			dispatch(updateUserProfile(userUpdateProfile));
 		} catch (error) {
-			console.log("authSingUpUser >> errorCode:", error.code);
-			console.log("authSingUpUser >> errorMessage:", error.message);
+			console.log("authSingUpUser >> error:", error);
 		}
 	};
 };
@@ -56,8 +49,7 @@ export const authSingInUser =
 		try {
 			await signInWithEmailAndPassword(auth, email, password);
 		} catch (error) {
-			console.log("authSingInUser >> errorCode:", error.code);
-			console.log("authSingInUser >> errorMessage:", error.message);
+			console.log("authSingInUser:", error);
 		}
 	};
 
@@ -71,24 +63,13 @@ export const authStateChangeUser = () => async (dispatch, getState) => {
 			dispatch(updateStateChange({ stateChange: true }));
 			dispatch(updateUserProfile(userUpdateProfile));
 		}
-		// dispatch(
-		// 	updateUserProfile({
-		// 		userId: user.uid,
-		// 		nickname: user.displayName,
-		// 	})
-		// );
 	});
 };
 
 export const authSingOutUser = () => async (dispatch, getState) => {
 	try {
-		const outFirebaseResult = await signOut(auth); // exit on firebase
-		console.log("authSingOutUser >> outFirebaseResult:", outFirebaseResult);
-		const authOutDispatchResult = dispatch(authSingOut()); // clear redux
-		console.log(
-			"authSingOutUser >> authOutDispatchResult:",
-			authOutDispatchResult
-		);
+		await signOut(auth); // exit on firebase
+		dispatch(authSingOut()); // clear redux
 	} catch (error) {
 		console.log("authSingOutUser >> error:", error);
 	}

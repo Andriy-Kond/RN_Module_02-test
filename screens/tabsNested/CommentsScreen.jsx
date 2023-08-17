@@ -25,22 +25,14 @@ import { useRoute } from "@react-navigation/native";
 // 	}
 // };
 import { dbFirestore } from "../../firebase/config";
-import {
-	collection,
-	doc,
-	getDocs,
-	setDoc,
-	addDoc,
-	query,
-	onSnapshot,
-} from "firebase/firestore";
+import { collection, doc, addDoc, query, onSnapshot } from "firebase/firestore";
 
 import { useKeyboardState } from "../../utils/keyboardContext";
 import { useSelector } from "react-redux";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function CommentsScreen() {
-	const { isKeyboardShown, hideKB } = useKeyboardState();
+	const { hideKB } = useKeyboardState();
 	const currentUser = useSelector((store) => store.auth.nickname);
 
 	const {
@@ -134,7 +126,6 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		justifyContent: "flex-end",
-		// alignItems: "center",
 		paddingHorizontal: 20,
 		paddingBottom: 20,
 	},
