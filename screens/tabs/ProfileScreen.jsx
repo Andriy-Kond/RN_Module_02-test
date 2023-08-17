@@ -28,6 +28,10 @@ export default function ProfileScreen() {
 		};
 	}, []);
 
+	const signOut = () => {
+		dispatch(authSingOutUser());
+	};
+
 	const getAllCurrentUserPosts = async () => {
 		// const currentUserRef = doc(dbFirestore, "dcim");
 		// const dcimCollection = query(collection(dbFirestore, "dcim"));
@@ -53,12 +57,7 @@ export default function ProfileScreen() {
 		<View style={styles.container}>
 			<Text>It is ProfileScreen</Text>
 			<View>
-				<Button
-					title="SIGN OUT"
-					onPress={() => {
-						dispatch(authSingOutUser());
-					}}
-				/>
+				<Button title="SIGN OUT" onPress={signOut} />
 
 				<FlatList
 					data={currentUserPosts}

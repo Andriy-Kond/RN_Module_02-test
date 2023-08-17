@@ -9,6 +9,8 @@ import {
 import { auth } from "../../firebase/config";
 import { authSlice } from "./authReducer";
 
+const { updateUserProfile, updateStateChange, authSingOut } = authSlice.actions;
+
 export const authSingUpUser = ({ email, password, nickname }) => {
 	return async (dispatch) => {
 		try {
@@ -30,12 +32,17 @@ export const authSingUpUser = ({ email, password, nickname }) => {
 			// 	password
 			// );
 
-			dispatch(
-				authSlice.actions.updateUserProfile({
-					userId: userCredential.user.uid,
-					nickname: userCredential.user.displayName,
-				})
-			);
+			// dispatch(
+			// 	updateUserProfile({
+			// 		userId: userCredential.user.uid,
+			// 		nickname: userCredential.user.displayName,
+			// 	})
+			// );
+			const userUpdateProfile = {
+				userId: userCredential.user.uid,
+				nickname: userCredential.user.displayName,
+			};
+			dispatch(updateUserProfile(userUpdateProfil));
 		} catch (error) {
 			console.log("authSingUpUser >> errorCode:", error.code);
 			console.log("authSingUpUser >> errorMessage:", error.message);
@@ -57,28 +64,32 @@ export const authSingInUser =
 export const authStateChangeUser = () => async (dispatch, getState) => {
 	onAuthStateChanged(auth, (user) => {
 		if (user) {
-			dispatch(
-				authSlice.actions.updateUserProfile({
-					userId: user.uid,
-					nickname: user.displayName,
-				})
-			);
-			dispatch(authSlice.actions.updateStateChange({ stateChange: true }));
+			const userUpdateProfile = {
+				userId: user.uid,
+				nickname: user.displayName,
+			};
+			dispatch(updateStateChange({ stateChange: true }));
+			dispatch(updateUserProfile(userUpdateProfile));
 		}
+		// dispatch(
+		// 	updateUserProfile({
+		// 		userId: user.uid,
+		// 		nickname: user.displayName,
+		// 	})
+		// );
 	});
 };
 
 export const authSingOutUser = () => async (dispatch, getState) => {
-	// await signOut(auth);
-
-	signOut(auth)
-		.then(() => {
-			// Sign-out successful.
-			console.log("Sign-out successful");
-		})
-		.catch((error) => {
-			// An error happened.
-			console.log("An error happened :>> ", error);
-		});
-	await dispatch(authSlice.actions.authSingOut());
+	try {
+		const outFirebaseResult = await signOut(auth); // exit on firebase
+		console.log("authSingOutUser >> outFirebaseResult:", outFirebaseResult);
+		const authOutDispatchResult = dispatch(authSingOut()); // clear redux
+		console.log(
+			"authSingOutUser >> authOutDispatchResult:",
+			authOutDispatchResult
+		);
+	} catch (error) {
+		console.log("authSingOutUser >> error:", error);
+	}
 };
