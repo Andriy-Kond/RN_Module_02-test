@@ -155,16 +155,23 @@ export default function CreateScreen() {
 					(!isTabButtonsEnabled ? (
 						<View style={styles.sendingMessageContainer}>
 							<Text style={styles.sendingMessage}>
-								Sending data to the server. {"\n"} Please wait.
+								Sending data to the server.{"\n"}Please wait.
 							</Text>
 						</View>
 					) : (
 						<Camera ref={cameraRef} style={styles.camera} type={type}>
 							{capturedPhoto && (
 								<View style={styles.photoImgContainer}>
-									<Image
-										source={{ uri: capturedPhoto }}
-										style={styles.photoImg}></Image>
+									{!isBtnSendEnabled ? (
+										<Text style={styles.sendingMessage}>
+											Saving data to the phone.{"\n"}Please wait
+										</Text>
+									) : (
+										<Image
+											source={{ uri: capturedPhoto }}
+											style={styles.photoImg}
+										/>
+									)}
 								</View>
 							)}
 						</Camera>
